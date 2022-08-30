@@ -3,10 +3,42 @@ import GetMachineUtilizations from '../../services/GetMachineUtilizations'
 import { useParams } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { CChartBar } from '@coreui/react-chartjs'
+import GetMachines from '../../services/GetMachines'
 import * as moment from 'moment'
 import { Link, useNavigate } from 'react-router-dom'
-import { CButton, CRow, CCol, CCard, CCardBody, CCardText, CCardTitle } from '@coreui/react'
+import {
+  CButton,
+  CRow,
+  CCol,
+  CCard,
+  CCardBody,
+  CCardText,
+  CCardTitle,
+  CCardHeader,
+} from '@coreui/react'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { Bar } from 'react-chartjs-2'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+
+const options = {
+  scales: {
+    x: {
+      stacked: true,
+    },
+    y: {
+      stacked: true,
+    },
+  },
+}
 
 const AverageReport = (props) => {
   return (
@@ -29,8 +61,11 @@ const Summary = () => {
   const [machineUtilizations, setMachineUtilizations] = useState([])
   const [productionTimeAverage, setProductionTimeAverage] = useState(0)
   const [powerOnAverage, setPowerOnAverage] = useState(0)
+  const [machine, setMachine] = useState()
 
   const fetchMachineUtilizations = async () => {
+    let machines = await GetMachines()
+    setMachine(machines.filter((element) => element.guid >= machineId)[0])
     let response = await GetMachineUtilizations(
       machineId,
       moment(strat).format('MM-DD-YYYY'),
@@ -61,15 +96,36 @@ const Summary = () => {
 
   return (
     <>
-      <label>{machineId}</label>
-      <DatePicker selected={strat} onChange={(date) => setStart(date)} />
-      <DatePicker selected={end} onChange={(date) => setEnd(date)} />
-      <CButton color="primary" className="px-4" onClick={fetchMachineUtilizations}>
-        Filter
-      </CButton>
+      <h1>Machine Utilization Summary</h1>
+      <h2>{machine.name}</h2>
+      <CRow>
+        <CCol xs={12}>
+          <CCard>
+            <CCardHeader>Filters</CCardHeader>
+            <CCardBody>
+              <CCardText>
+                <CRow>
+                  <CCol xs={2}>Strat date</CCol>
+                  <CCol xs={10}>
+                    <DatePicker selected={strat} onChange={(date) => setStart(date)} />
+                  </CCol>
+                  <CCol xs={2}>End date</CCol>
+                  <CCol xs={10}>
+                    <DatePicker selected={end} onChange={(date) => setEnd(date)} />
+                  </CCol>
+                </CRow>
+              </CCardText>
+              <CButton color="primary" className="px-4" onClick={fetchMachineUtilizations}>
+                Filter
+              </CButton>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
       <CRow>
         <CCol xs={6}>
-          <CChartBar
+          <Bar
+            options={options}
             data={{
               labels: machineUtilizations.map((machine) =>
                 moment(machine.date).format('MM-DD-YYYY'),
@@ -94,7 +150,8 @@ const Summary = () => {
           <AverageReport average={productionTimeAverage.toFixed(2)} />
         </CCol>
         <CCol xs={6}>
-          <CChartBar
+          <Bar
+            options={options}
             data={{
               labels: machineUtilizations.map((machine) =>
                 moment(machine.date).format('MM-DD-YYYY'),
