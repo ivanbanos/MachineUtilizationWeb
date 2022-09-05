@@ -31,7 +31,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'List Machine',
-    to: '/theme/colors',
+    to: '/500',
     icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
     badge: {
       color: 'warning',
@@ -41,7 +41,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Add new Machine',
-    to: '/theme/colors',
+    to: '/500',
     icon: <CIcon icon={cilPlus} customClassName="nav-icon" />,
     badge: {
       color: 'warning',
@@ -55,7 +55,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'List Users',
-    to: '/theme/colors',
+    to: '/500',
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
     badge: {
       color: 'warning',

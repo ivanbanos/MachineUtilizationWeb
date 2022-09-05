@@ -33,6 +33,9 @@ const MachinesDropdown = (props) => {
               <CDropdownItem>
                 <Link to={'/summary/' + props.guid}>Utilization Summary</Link>
               </CDropdownItem>
+              <CDropdownItem>
+                <Link to={'/MachineUtilizations/' + props.guid}>Utilization list</Link>
+              </CDropdownItem>
             </CDropdownMenu>
           </CDropdown>
         }

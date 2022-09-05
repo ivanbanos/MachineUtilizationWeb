@@ -1,20 +1,16 @@
 import configData from '../config.json'
 
-const GetMachineUtilizations = async (machine, stratDate, endDate, operator) => {
+const AddOperatorToMachineUtilization = async (operator, machineUtilization) => {
   try {
     const token = localStorage.getItem('token')
     const response = await fetch(
       configData.SERVER_URL +
-        '/api/MachineUtilization/machine/' +
-        machine +
-        '/start/' +
-        stratDate +
-        '/end/' +
-        endDate +
-        '/Operator/' +
-        operator,
+        '/api/Operators/Add/Operator/' +
+        operator +
+        '/MacihneUtilization/' +
+        machineUtilization,
       {
-        method: 'GET',
+        method: 'POST',
         mode: 'cors',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -34,13 +30,10 @@ const GetMachineUtilizations = async (machine, stratDate, endDate, operator) => 
     if (response.status == 403) {
       return 'fail'
     }
-    if (response.status == 401) {
-      return 'fail'
-    }
     return 'fail'
   } catch (error) {
     return 'fail'
   }
 }
 
-export default GetMachineUtilizations
+export default AddOperatorToMachineUtilization

@@ -1,18 +1,10 @@
 import configData from '../config.json'
 
-const GetMachineUtilizations = async (machine, stratDate, endDate, operator) => {
+const GetListOperators = async (machine) => {
   try {
     const token = localStorage.getItem('token')
     const response = await fetch(
-      configData.SERVER_URL +
-        '/api/MachineUtilization/machine/' +
-        machine +
-        '/start/' +
-        stratDate +
-        '/end/' +
-        endDate +
-        '/Operator/' +
-        operator,
+      configData.SERVER_URL + '/api/Operators/GetList/Machine/' + machine,
       {
         method: 'GET',
         mode: 'cors',
@@ -43,4 +35,4 @@ const GetMachineUtilizations = async (machine, stratDate, endDate, operator) => 
   }
 }
 
-export default GetMachineUtilizations
+export default GetListOperators

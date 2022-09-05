@@ -6,6 +6,7 @@ import { CContainer, CSpinner } from '@coreui/react'
 import routes from '../routes'
 
 const Summary = React.lazy(() => import('../views/summary/Summary'))
+const UtilizationList = React.lazy(() => import('../views/utilizationlist/UtilizationList'))
 const AppContent = () => {
   return (
     <CContainer lg>
@@ -26,6 +27,9 @@ const AppContent = () => {
           })}
           <Route path="/summary">
             <Route path=":machineId" element={<Summary />} />
+          </Route>
+          <Route path="/MachineUtilizations">
+            <Route path=":machineId" element={<UtilizationList />} />
           </Route>
           <Route path="/" element={<Navigate to="dashboard" replace />} />
         </Routes>
