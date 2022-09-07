@@ -34,9 +34,12 @@ const Login = () => {
     event.preventDefault()
     const token = await GetToken(first_name, password)
     console.log(token)
+    console.log(token.token)
+    console.log(token.idRole)
     // Compare user info
     if (token) {
-      localStorage.setItem('token', token)
+      localStorage.setItem('token', token.token)
+      localStorage.setItem('role', token.idRole)
       navigate('/Dashboard', { replace: true })
     } else {
       // Username not found

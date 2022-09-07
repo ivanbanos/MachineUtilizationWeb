@@ -6,6 +6,7 @@ import { CBadge } from '@coreui/react'
 
 export const AppSidebarNav = ({ items }) => {
   const location = useLocation()
+  const role = localStorage.getItem('role')
   const navLink = (name, icon, badge) => {
     return (
       <>
@@ -57,7 +58,9 @@ export const AppSidebarNav = ({ items }) => {
   return (
     <React.Fragment>
       {items &&
-        items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
+        items.map((item, index) =>
+          item.level >= role ? item.items ? navGroup(item, index) : navItem(item, index) : <></>,
+        )}
     </React.Fragment>
   )
 }
