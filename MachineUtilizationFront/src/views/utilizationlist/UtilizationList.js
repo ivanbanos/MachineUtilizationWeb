@@ -163,7 +163,7 @@ const UtilizationList = () => {
               <CCardText>
                 <CRow>
                   <CCol style={{ margin: '2pt' }} xs={2}>
-                    Strat date
+                    Start date
                   </CCol>
                   <CCol style={{ margin: '2pt' }} xs={10}>
                     <DatePicker selected={strat} onChange={(date) => setStart(date)} />
