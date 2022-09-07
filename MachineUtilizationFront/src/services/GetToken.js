@@ -18,8 +18,8 @@ const GetToken = async (username, password) => {
       },
     )
     if (response.status == 200) {
-      let text = await response.text()
-      return text
+      let json = await response.json()
+      return json
     }
     return null
   } catch (error) {}
