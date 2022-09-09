@@ -62,6 +62,20 @@ const _nav = [
       text: 'soon',
     },
   },
+  {
+    component: CNavTitle,
+    name: 'Operators',
+  },
+  {
+    component: CNavItem,
+    name: 'List Operators',
+    to: '/500',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+    badge: {
+      color: 'warning',
+      text: 'soon',
+    },
+  },
 ]
 
 export default _nav
