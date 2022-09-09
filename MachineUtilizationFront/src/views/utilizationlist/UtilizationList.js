@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import GetMachines from '../../services/GetMachines'
-import AddOperator from '../../services/AddOperator'
 import GetListOperators from '../../services/GetListOperators'
 import AddOperatorToMachineUtilization from '../../services/AddOperatorToMachineUtilization'
 import * as moment from 'moment'
@@ -65,49 +64,6 @@ const MachineOperator = (props) => {
   )
 }
 
-const AddOperatorComponent = (props) => {
-  const [addOperatorVisible, setAddOperatorVisible] = useState(false)
-  const [newOperatorName, setNewOperatorName] = useState()
-  const handleNameChange = (event) => {
-    setNewOperatorName(event.target.value)
-  }
-  const addOperator = async () => {
-    await AddOperator(newOperatorName)
-    props.GetOperators(props.Machine)
-    setAddOperatorVisible(false)
-    props.toast.current.showToast('Operator added successfully')
-  }
-
-  return (
-    <>
-      <CButton style={{ margin: '2pt' }} onClick={() => setAddOperatorVisible(true)}>
-        Add operator
-      </CButton>
-      <CModal visible={addOperatorVisible} onClose={() => setAddOperatorVisible(false)}>
-        <CModalHeader>
-          <CModalTitle>Adding operator</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <CRow>
-            <CCol xs={2}>Name</CCol>
-            <CCol xs={10}>
-              <CFormInput placeholder="Name" onChange={handleNameChange} />
-            </CCol>
-          </CRow>
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setAddOperatorVisible(false)}>
-            Close
-          </CButton>
-          <CButton color="primary" onClick={addOperator}>
-            Add
-          </CButton>
-        </CModalFooter>
-      </CModal>
-    </>
-  )
-}
-
 const UtilizationList = () => {
   let navigate = useNavigate()
   let { machineId } = useParams()
@@ -120,7 +76,7 @@ const UtilizationList = () => {
   const toastRef = useRef()
 
   const getListOperators = async (machine) => {
-    let operators = await GetListOperators(machine.guid)
+    let operators = await GetListOperators(machine.idClient)
     setOperators(operators)
   }
 
@@ -201,11 +157,6 @@ const UtilizationList = () => {
               >
                 Filter
               </CButton>
-              <AddOperatorComponent
-                GetOperators={getListOperators}
-                Machine={machine}
-                toast={toastRef}
-              />
             </CCardBody>
           </CCard>
         </CCol>

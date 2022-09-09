@@ -1,10 +1,16 @@
 import configData from '../config.json'
 
-const AddOperator = async (operatorName, client, user) => {
+const AddUsers = async (userName, password, role, idClient) => {
   try {
     const token = localStorage.getItem('token')
-    const body = { name: operatorName, idClient: client, idUser: user }
-    const response = await fetch(configData.SERVER_URL + '/api/Operators/Add/Operator', {
+    const body = {
+      guid: '00000000-0000-0000-0000-000000000000',
+      username: userName,
+      password: password,
+      idRole: role,
+      idClient: idClient,
+    }
+    const response = await fetch(configData.SERVER_URL + '/api/Users/createUser', {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify(body),
@@ -20,8 +26,8 @@ const AddOperator = async (operatorName, client, user) => {
       },
     })
     if (response.status == 200) {
-      let machines = await response.json()
-      return machines
+      let user = await response.json()
+      return user
     }
     if (response.status == 403) {
       return 'fail'
@@ -32,4 +38,4 @@ const AddOperator = async (operatorName, client, user) => {
   }
 }
 
-export default AddOperator
+export default AddUsers

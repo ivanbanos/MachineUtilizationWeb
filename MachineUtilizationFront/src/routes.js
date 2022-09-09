@@ -47,10 +47,18 @@ const Alerts = React.lazy(() => import('./views/notifications/alerts/Alerts'))
 const Badges = React.lazy(() => import('./views/notifications/badges/Badges'))
 const Modals = React.lazy(() => import('./views/notifications/modals/Modals'))
 const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
+const Clients = React.lazy(() => import('./views/clients/Clients'))
+const Machines = React.lazy(() => import('./views/machines/MachinesList'))
+const Users = React.lazy(() => import('./views/users/Users'))
+const Operator = React.lazy(() => import('./views/operator/Operator'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+  { path: '/operator', name: 'Operator', element: Operator },
+  { path: '/clients', name: 'Client', element: Clients },
+  { path: '/machines', name: 'Machines', element: Machines },
+  { path: '/users', name: 'Users', element: Users },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },

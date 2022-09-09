@@ -68,7 +68,9 @@ const Summary = () => {
   const [operators, setOperators] = useState([])
 
   const getListOperators = async (machine) => {
-    let operators = await GetListOperators(machine.guid)
+    console.log(machine)
+    let operators = await GetListOperators(machine.idClient)
+    console.log(operators)
     setOperators(operators)
   }
 

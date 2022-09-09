@@ -1,13 +1,13 @@
 import configData from '../config.json'
 
-const AddOperator = async (operatorName, client, user) => {
+const UpdateClient = async (client, name) => {
   try {
     const token = localStorage.getItem('token')
-    const body = { name: operatorName, idClient: client, idUser: user }
-    const response = await fetch(configData.SERVER_URL + '/api/Operators/Add/Operator', {
-      method: 'POST',
+    client.name = name
+    const response = await fetch(configData.SERVER_URL + '/api/Client', {
+      method: 'PUT',
       mode: 'cors',
-      body: JSON.stringify(body),
+      body: JSON.stringify(client),
       headers: {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
@@ -32,4 +32,4 @@ const AddOperator = async (operatorName, client, user) => {
   }
 }
 
-export default AddOperator
+export default UpdateClient

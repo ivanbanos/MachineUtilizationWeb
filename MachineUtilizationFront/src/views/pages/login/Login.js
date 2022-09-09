@@ -40,7 +40,12 @@ const Login = () => {
     if (token) {
       localStorage.setItem('token', token.token)
       localStorage.setItem('role', token.idRole)
-      navigate('/Dashboard', { replace: true })
+      localStorage.setItem('idClient', token.idClient)
+      if (token.idRole < 3) {
+        navigate('/Dashboard', { replace: true })
+      } else {
+        navigate('/Operator', { replace: true })
+      }
     } else {
       // Username not found
       seterrormessages({ name: 'password', message: 'Username or Password incorrect' })

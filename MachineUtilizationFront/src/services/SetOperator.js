@@ -1,12 +1,12 @@
 import configData from '../config.json'
 
-const GetListOperators = async (IdClient) => {
+const SetOperator = async (machine) => {
   try {
     const token = localStorage.getItem('token')
     const response = await fetch(
-      configData.SERVER_URL + '/api/Operators/GetList/Client/' + IdClient,
+      configData.SERVER_URL + '/api/Operators/SetToShift/machine/' + machine,
       {
-        method: 'GET',
+        method: 'POST',
         mode: 'cors',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -35,4 +35,4 @@ const GetListOperators = async (IdClient) => {
   }
 }
 
-export default GetListOperators
+export default SetOperator

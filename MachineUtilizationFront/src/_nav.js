@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilCalculator, cilSpeedometer, cilUser, cilPlus } from '@coreui/icons'
+import { cilCalculator, cilSpeedometer, cilUser, cilPlus, cilCog, cilContact } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = [
@@ -9,49 +9,27 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    level: 3,
+    level: 2,
   },
   {
-    component: CNavTitle,
+    component: CNavItem,
+    name: 'Clients',
+    to: '/clients',
+    icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
+    level: 1,
+  },
+  {
+    component: CNavItem,
     name: 'Machines',
+    to: '/machines',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     level: 2,
   },
   {
     component: CNavItem,
-    name: 'List Machine',
-    to: '/500',
-    icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
-    badge: {
-      color: 'warning',
-      text: 'soon',
-    },
-    level: 2,
-  },
-  {
-    component: CNavItem,
-    name: 'Add new Machine',
-    to: '/500',
-    icon: <CIcon icon={cilPlus} customClassName="nav-icon" />,
-    badge: {
-      color: 'warning',
-      text: 'soon',
-    },
-    level: 2,
-  },
-  {
-    component: CNavTitle,
     name: 'Users',
-    level: 2,
-  },
-  {
-    component: CNavItem,
-    name: 'List Users',
-    to: '/500',
+    to: '/users',
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
-    badge: {
-      color: 'warning',
-      text: 'soon',
-    },
     level: 2,
   },
 ]
