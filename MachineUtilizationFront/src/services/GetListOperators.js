@@ -1,10 +1,10 @@
 import configData from '../config.json'
 
-const GetListOperators = async (machine) => {
+const GetListOperators = async (IdClient) => {
   try {
     const token = localStorage.getItem('token')
     const response = await fetch(
-      configData.SERVER_URL + '/api/Operators/GetList/Machine/' + machine,
+      configData.SERVER_URL + '/api/Operators/GetList/Client/' + IdClient,
       {
         method: 'GET',
         mode: 'cors',

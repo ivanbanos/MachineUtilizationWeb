@@ -1,10 +1,10 @@
 import configData from '../config.json'
 
-const GetMachines = async () => {
+const GetClients = async () => {
   try {
     const token = localStorage.getItem('token')
     console.log(token)
-    const response = await fetch(configData.SERVER_URL + '/api/Machines/GetList', {
+    const response = await fetch(configData.SERVER_URL + '/api/Client', {
       method: 'GET',
       mode: 'cors',
       headers: {
@@ -30,4 +30,4 @@ const GetMachines = async () => {
   }
 }
 
-export default GetMachines
+export default GetClients

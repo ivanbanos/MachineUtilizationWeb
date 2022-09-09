@@ -1,15 +1,23 @@
 import configData from '../config.json'
 
-const GetMachines = async () => {
+const AddUsers = async (userName, password, role, idClient) => {
   try {
     const token = localStorage.getItem('token')
-    console.log(token)
-    const response = await fetch(configData.SERVER_URL + '/api/Machines/GetList', {
-      method: 'GET',
+    const body = {
+      guid: '00000000-0000-0000-0000-000000000000',
+      username: userName,
+      password: password,
+      idRole: role,
+      idClient: idClient,
+    }
+    const response = await fetch(configData.SERVER_URL + '/api/Users/createUser', {
+      method: 'POST',
       mode: 'cors',
+      body: JSON.stringify(body),
       headers: {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
+        'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
         'sec-fetch-mode': 'cors',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -18,8 +26,8 @@ const GetMachines = async () => {
       },
     })
     if (response.status == 200) {
-      let machines = await response.json()
-      return machines
+      let user = await response.json()
+      return user
     }
     if (response.status == 403) {
       return 'fail'
@@ -30,4 +38,4 @@ const GetMachines = async () => {
   }
 }
 
-export default GetMachines
+export default AddUsers

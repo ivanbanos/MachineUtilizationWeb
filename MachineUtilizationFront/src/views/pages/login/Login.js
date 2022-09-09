@@ -34,10 +34,18 @@ const Login = () => {
     event.preventDefault()
     const token = await GetToken(first_name, password)
     console.log(token)
+    console.log(token.token)
+    console.log(token.idRole)
     // Compare user info
     if (token) {
-      localStorage.setItem('token', token)
-      navigate('/Dashboard', { replace: true })
+      localStorage.setItem('token', token.token)
+      localStorage.setItem('role', token.idRole)
+      localStorage.setItem('idClient', token.idClient)
+      if (token.idRole < 3) {
+        navigate('/Dashboard', { replace: true })
+      } else {
+        navigate('/Operator', { replace: true })
+      }
     } else {
       // Username not found
       seterrormessages({ name: 'password', message: 'Username or Password incorrect' })

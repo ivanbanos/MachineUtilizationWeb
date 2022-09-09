@@ -1,15 +1,17 @@
 import configData from '../config.json'
 
-const GetMachines = async () => {
+const UpdateClient = async (client, name) => {
   try {
     const token = localStorage.getItem('token')
-    console.log(token)
-    const response = await fetch(configData.SERVER_URL + '/api/Machines/GetList', {
-      method: 'GET',
+    client.name = name
+    const response = await fetch(configData.SERVER_URL + '/api/Client', {
+      method: 'PUT',
       mode: 'cors',
+      body: JSON.stringify(client),
       headers: {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
+        'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
         'sec-fetch-mode': 'cors',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -30,4 +32,4 @@ const GetMachines = async () => {
   }
 }
 
-export default GetMachines
+export default UpdateClient

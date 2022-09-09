@@ -68,7 +68,9 @@ const Summary = () => {
   const [operators, setOperators] = useState([])
 
   const getListOperators = async (machine) => {
-    let operators = await GetListOperators(machine.guid)
+    console.log(machine)
+    let operators = await GetListOperators(machine.idClient)
+    console.log(operators)
     setOperators(operators)
   }
 
@@ -122,7 +124,7 @@ const Summary = () => {
               <CCardText>
                 <CRow>
                   <CCol style={{ margin: '2pt' }} xs={2}>
-                    Strat date
+                    Start date
                   </CCol>
                   <CCol style={{ margin: '2pt' }} xs={10}>
                     <DatePicker selected={strat} onChange={(date) => setStart(date)} />
@@ -170,7 +172,7 @@ const Summary = () => {
               datasets: [
                 {
                   label: 'Production time',
-                  backgroundColor: '#052CA5',
+                  backgroundColor: '#05A51B',
                   data: machineUtilizations.map((machine) => machine.productionTime),
                 },
                 {
@@ -196,7 +198,7 @@ const Summary = () => {
               datasets: [
                 {
                   label: 'Power ON',
-                  backgroundColor: '#086700',
+                  backgroundColor: '#052CA5',
                   data: machineUtilizations.map((machine) => {
                     return machine.idleTime + machine.productionTime
                   }),
