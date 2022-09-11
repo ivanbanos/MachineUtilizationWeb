@@ -33,18 +33,11 @@ const _nav = [
     level: 2,
   },
   {
-    component: CNavTitle,
-    name: 'Operators',
-  },
-  {
     component: CNavItem,
-    name: 'List Operators',
-    to: '/500',
+    name: 'Operators',
+    to: '/operators',
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
-    badge: {
-      color: 'warning',
-      text: 'soon',
-    },
+    level: 2,
   },
 ]
 
