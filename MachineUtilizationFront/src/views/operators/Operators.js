@@ -26,27 +26,27 @@ import {
 
 import Toast from '../toast/Toast'
 
-const AddClientModal = (props) => {
-  const [addClientVisible, setAddClientVisible] = useState(false)
-  const [newClientName, setNewClientName] = useState()
+const AddOperatorModal = (props) => {
+  const [addOperatorVisible, setAddOperatorVisible] = useState(false)
+  const [newOperatorName, setNewOperatorName] = useState()
   const handleNameChange = (event) => {
-    setNewClientName(event.target.value)
+    setNewOperatorName(event.target.value)
   }
-  const addClient = async () => {
-    await AddClient(newClientName)
-    props.GetClients()
-    setAddClientVisible(false)
-    props.toast.current.showToast('Client added successfully')
+  const addOperator = async () => {
+    // await AddOperator(newOperatorName)
+    props.GetAllOperators()
+    setAddOperatorVisible(false)
+    props.toast.current.showToast('Operator added successfully')
   }
 
   return (
     <>
-      <CButton style={{ margin: '2pt' }} onClick={() => setAddClientVisible(true)}>
+      <CButton style={{ margin: '2pt' }} onClick={() => setAddOperatorVisible(true)}>
         <CIcon icon={cilPlus} size="m" />
       </CButton>
-      <CModal visible={addClientVisible} onClose={() => setAddClientVisible(false)}>
+      <CModal visible={addOperatorVisible} onClose={() => setAddOperatorVisible(false)}>
         <CModalHeader>
-          <CModalTitle>Adding Client</CModalTitle>
+          <CModalTitle>Adding Operator</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CRow>
@@ -57,10 +57,10 @@ const AddClientModal = (props) => {
           </CRow>
         </CModalBody>
         <CModalFooter>
-          <CButton color="secondary" onClick={() => setAddClientVisible(false)}>
+          <CButton color="secondary" onClick={() => setAddOperatorVisible(false)}>
             Close
           </CButton>
-          <CButton color="primary" onClick={addClient}>
+          <CButton color="primary" onClick={addOperator}>
             Add
           </CButton>
         </CModalFooter>
@@ -69,64 +69,59 @@ const AddClientModal = (props) => {
   )
 }
 
-const TaskClient = (props) => {
+const TaskOperator = (props) => {
   let navigate = useNavigate()
-  const [updateClientVisible, setUpdateClientVisible] = useState(false)
-  const [newClientName, setNewClientName] = useState(props.Client.name)
-  const [deleteClientVisible, setDeleteClientVisible] = useState(false)
+  const [updateOperatorVisible, setUpdateOperatorVisible] = useState(false)
+  const [newOperatorName, setNewOperatorName] = useState(props.Operator.name)
+  const [deleteOperatorVisible, setDeleteOperatorVisible] = useState(false)
   const handleNameChange = (event) => {
-    setNewClientName(event.target.value)
+    setNewOperatorName(event.target.value)
   }
-  const updateClient = async () => {
-    await UpdateClient(props.Client, newClientName)
-    props.GetClients()
-    setUpdateClientVisible(false)
-    props.toast.current.showToast('Client updated successfully')
+  const updateOperator = async () => {
+    // await UpdateOperator(props.Operator, newOperatorName)
+    props.GetOperators()
+    setUpdateOperatorVisible(false)
+    props.toast.current.showToast('Operator updated successfully')
   }
-  const deleteClient = async () => {
-    await DeleteClient(props.Client)
-    props.GetClients()
-    setDeleteClientVisible(false)
-    props.toast.current.showToast('Client deleted successfully')
-  }
-
-  const GoClient = async (event) => {
-    event.preventDefault()
-    navigate('/Client/' + props.Client.guid, { replace: true })
+  const deleteOperator = async () => {
+    // await DeleteOperator(props.Operator)
+    props.GetOperators()
+    setDeleteOperatorVisible(false)
+    props.toast.current.showToast('Operator deleted successfully')
   }
 
   return (
     <>
-      <CButton style={{ margin: '2pt' }} onClick={() => setUpdateClientVisible(true)}>
+      <CButton style={{ margin: '2pt' }} onClick={() => setUpdateOperatorVisible(true)}>
         <CIcon icon={cilPencil} size="m" />
       </CButton>
-      <CModal visible={updateClientVisible} onClose={() => setUpdateClientVisible(false)}>
+      <CModal visible={updateOperatorVisible} onClose={() => setUpdateOperatorVisible(false)}>
         <CModalHeader>
-          <CModalTitle>Updating Client</CModalTitle>
+          <CModalTitle>Updating Operator</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CRow>
             <CCol xs={2}>Name</CCol>
             <CCol xs={10}>
-              <CFormInput placeholder="Name" onChange={handleNameChange} value={newClientName} />
+              <CFormInput placeholder="Name" onChange={handleNameChange} value={newOperatorName} />
             </CCol>
           </CRow>
         </CModalBody>
         <CModalFooter>
-          <CButton color="secondary" onClick={() => setUpdateClientVisible(false)}>
+          <CButton color="secondary" onClick={() => setUpdateOperatorVisible(false)}>
             Close
           </CButton>
-          <CButton color="primary" onClick={updateClient}>
+          <CButton color="primary" onClick={updateOperator}>
             Update
           </CButton>
         </CModalFooter>
       </CModal>
-      <CButton style={{ margin: '2pt' }} onClick={() => setDeleteClientVisible(true)}>
+      <CButton style={{ margin: '2pt' }} onClick={() => setDeleteOperatorVisible(true)}>
         <CIcon icon={cilX} size="m" />
       </CButton>
-      <CModal visible={deleteClientVisible} onClose={() => setDeleteClientVisible(false)}>
+      <CModal visible={deleteOperatorVisible} onClose={() => setDeleteOperatorVisible(false)}>
         <CModalHeader>
-          <CModalTitle>Delete Client</CModalTitle>
+          <CModalTitle>Delete Operator</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CRow>
@@ -134,10 +129,10 @@ const TaskClient = (props) => {
           </CRow>
         </CModalBody>
         <CModalFooter>
-          <CButton color="secondary" onClick={() => setDeleteClientVisible(false)}>
+          <CButton color="secondary" onClick={() => setDeleteOperatorVisible(false)}>
             Close
           </CButton>
-          <CButton color="primary" onClick={deleteClient}>
+          <CButton color="primary" onClick={deleteOperator}>
             Delete
           </CButton>
         </CModalFooter>
@@ -148,30 +143,30 @@ const TaskClient = (props) => {
 
 const Operators = () => {
   let navigate = useNavigate()
-  const [clients, setClients] = useState([])
+  const [operators, setOperators] = useState([])
   const toastRef = useRef()
 
-  const fetchClients = async () => {
+  const fetchOperators = async () => {
     let role = localStorage.getItem('role')
     if (role > 1) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
     }
-    let clients = await GetAllOperators()
+    let operators = await GetAllOperators()
 
-    setClients(clients)
+    setOperators(operators)
   }
 
   useEffect(() => {
-    fetchClients()
+    fetchOperators()
   }, [])
 
   return (
     <>
       <Toast ref={toastRef}></Toast>
-      <h1>Clients</h1>
-      <AddClientModal GetClients={fetchClients} toast={toastRef} />
+      <h1>Operators</h1>
+      <AddOperatorModal GetOperators={fetchOperators} toast={toastRef} />
       <CRow>
         <CTable>
           <CTableHead>
@@ -181,11 +176,15 @@ const Operators = () => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {clients.map((client) => (
-              <CTableRow key={client.guid}>
-                <CTableHeaderCell>{client.name}</CTableHeaderCell>
+            {operators.map((operator) => (
+              <CTableRow key={operator.guid}>
+                <CTableHeaderCell>{operator.name}</CTableHeaderCell>
                 <CTableHeaderCell>
-                  <TaskClient GetClients={fetchClients} toast={toastRef} Client={client} />
+                  <TaskOperator
+                    GetOperators={fetchOperators}
+                    toast={toastRef}
+                    Operator={operator}
+                  />
                 </CTableHeaderCell>
               </CTableRow>
             ))}
