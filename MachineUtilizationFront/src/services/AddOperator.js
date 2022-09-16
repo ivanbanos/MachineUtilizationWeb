@@ -1,9 +1,10 @@
 import configData from '../config.json'
 
-const AddOperator = async (operatorName, client, user) => {
+const AddOperator = async (operatorName) => {
   try {
     const token = localStorage.getItem('token')
-    const body = { name: operatorName, idClient: client, idUser: user }
+    const client = localStorage.getItem('idClient')
+    const body = { name: operatorName, idClient: client }
     const response = await fetch(configData.SERVER_URL + '/api/Operators/Add/Operator', {
       method: 'POST',
       mode: 'cors',

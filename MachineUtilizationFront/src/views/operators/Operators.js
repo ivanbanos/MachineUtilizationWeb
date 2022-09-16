@@ -34,7 +34,7 @@ const AddOperatorModal = (props) => {
   }
   const addOperator = async () => {
     await AddOperator(newOperatorName)
-    props.GetAllOperators()
+    props.GetOperators()
     setAddOperatorVisible(false)
     props.toast.current.showToast('Operator added successfully')
   }
