@@ -54,6 +54,7 @@ const AddUserModal = (props) => {
     setNewPassword(event.target.value)
   }
   const handleClientChange = (event) => {
+    console.log(event.target.value)
     setClient(event.target.value)
   }
   const handleNameChange = (event) => {
@@ -75,6 +76,7 @@ const AddUserModal = (props) => {
     }
   }
   const addUser = async () => {
+    console.log(client)
     let user = await AddUser(newUserName, newPassword, newRole, client)
     if (newRole == 3) {
       await AddOperator(name, client, user.guid)
@@ -86,14 +88,16 @@ const AddUserModal = (props) => {
 
   const fetchClients = async () => {
     let role = localStorage.getItem('role')
-    if (role > 1) {
+    console.log(role)
+    if (role > 2) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
+    } else {
+      let clients = await GetClients()
+      console.log(clients)
+      setClients(clients)
     }
-    let clients = await GetClients()
-
-    setClients(clients)
   }
 
   useEffect(() => {
@@ -137,6 +141,7 @@ const AddUserModal = (props) => {
                 onChange={handleClientChange}
                 disabled={clientDisabled}
               >
+                <option value={'00000000-0000-0000-0000-000000000000'}>Select One</option>
                 {clients.map((client) => (
                   <option key={client.guid} value={client.guid}>
                     {client.name}
@@ -246,7 +251,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     let role = localStorage.getItem('role')
-    if (role > 1) {
+    if (role > 2) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)

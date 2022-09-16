@@ -146,7 +146,7 @@ const MachinesList = () => {
 
   const fetchMachines = async () => {
     let role = localStorage.getItem('role')
-    if (role > 1) {
+    if (role > 2) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
