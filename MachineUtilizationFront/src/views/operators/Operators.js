@@ -1,9 +1,9 @@
 import { React, useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react'
 import 'react-datepicker/dist/react-datepicker.css'
 import GetAllOperators from '../../services/GetAllOperators'
-import AddClient from '../../services/AddClient'
-import UpdateClient from '../../services/UpdateClient'
-import DeleteClient from '../../services/DeleteClient'
+import AddOperator from '../../services/AddOperator'
+import UpdateOperator from '../../services/UpdateOperator'
+import DeleteOperator from '../../services/DeleteOperator'
 import { useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilX } from '@coreui/icons'
@@ -33,7 +33,7 @@ const AddOperatorModal = (props) => {
     setNewOperatorName(event.target.value)
   }
   const addOperator = async () => {
-    // await AddOperator(newOperatorName)
+    await AddOperator(newOperatorName)
     props.GetAllOperators()
     setAddOperatorVisible(false)
     props.toast.current.showToast('Operator added successfully')
@@ -78,13 +78,13 @@ const TaskOperator = (props) => {
     setNewOperatorName(event.target.value)
   }
   const updateOperator = async () => {
-    // await UpdateOperator(props.Operator, newOperatorName)
+    await UpdateOperator(props.Operator, newOperatorName)
     props.GetOperators()
     setUpdateOperatorVisible(false)
     props.toast.current.showToast('Operator updated successfully')
   }
   const deleteOperator = async () => {
-    // await DeleteOperator(props.Operator)
+    await DeleteOperator(props.Operator)
     props.GetOperators()
     setDeleteOperatorVisible(false)
     props.toast.current.showToast('Operator deleted successfully')
