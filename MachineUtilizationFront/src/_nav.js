@@ -32,6 +32,13 @@ const _nav = [
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
     level: 2,
   },
+  {
+    component: CNavItem,
+    name: 'Operators',
+    to: '/operators',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+    level: 2,
+  },
 ]
 
 export default _nav

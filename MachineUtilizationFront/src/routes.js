@@ -51,6 +51,7 @@ const Clients = React.lazy(() => import('./views/clients/Clients'))
 const Machines = React.lazy(() => import('./views/machines/MachinesList'))
 const Users = React.lazy(() => import('./views/users/Users'))
 const Operator = React.lazy(() => import('./views/operator/Operator'))
+const Operators = React.lazy(() => import('./views/operators/Operators'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -100,6 +101,7 @@ const routes = [
   { path: '/notifications/badges', name: 'Badges', element: Badges },
   { path: '/notifications/modals', name: 'Modals', element: Modals },
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
+  { path: '/operators', name: 'Operators', element: Operators },
 ]
 
 export default routes
