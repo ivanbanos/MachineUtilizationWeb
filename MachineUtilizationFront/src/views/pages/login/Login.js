@@ -20,6 +20,9 @@ import '../../../App.css'
 
 const Login = () => {
   let navigate = useNavigate()
+  localStorage.setItem('token', null)
+  localStorage.setItem('role', null)
+  localStorage.setItem('idClient', null)
   const [errorMessages, seterrormessages] = useState({})
   const [first_name, setfirst_name] = useState()
   const [password, setPassword] = useState()
@@ -33,9 +36,6 @@ const Login = () => {
     //Prevent page reload
     event.preventDefault()
     const token = await GetToken(first_name, password)
-    console.log(token)
-    console.log(token.token)
-    console.log(token.idRole)
     // Compare user info
     if (token) {
       localStorage.setItem('token', token.token)

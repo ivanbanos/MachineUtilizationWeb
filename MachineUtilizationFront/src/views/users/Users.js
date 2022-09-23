@@ -4,6 +4,8 @@ import GetUsers from '../../services/GetUsers'
 import GetClients from '../../services/GetClients'
 import AddOperator from '../../services/AddOperator'
 import AddUser from '../../services/AddUser.js'
+import UpdateUser from '../../services/UpdateUser.js'
+import DeleteUser from '../../services/DeleteUser.js'
 import { useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilX } from '@coreui/icons'
@@ -41,9 +43,8 @@ const AddUserModal = (props) => {
   const [clients, setClients] = useState([])
   const [name, setName] = useState('')
   let roles = []
-  if ((role = 1)) {
+  if (role == 1) {
     roles.push({ value: 1, name: 'Administrator' })
-  } else {
   }
   roles.push({ value: 2, name: 'Supervisor' })
   roles.push({ value: 3, name: 'Operator' })
@@ -121,7 +122,7 @@ const AddUserModal = (props) => {
             </CCol>
             <CCol xs={2}>Password</CCol>
             <CCol xs={10}>
-              <CFormInput type="password" placeholder="Name" onChange={handlePasswordChange} />
+              <CFormInput type="password" placeholder="Password" onChange={handlePasswordChange} />
             </CCol>
             <CCol xs={2}>Role</CCol>
             <CCol xs={10}>
@@ -175,19 +176,66 @@ const AddUserModal = (props) => {
 const TaskUser = (props) => {
   let navigate = useNavigate()
   const [updateUserVisible, setUpdateUserVisible] = useState(false)
-  const [newUserName, setNewUserName] = useState(props.User.userName)
+  const [newUserName, setNewUserName] = useState(props.User.username)
   const [deleteUserVisible, setDeleteUserVisible] = useState(false)
-  const handleNameChange = (event) => {
+  let role = localStorage.getItem('role')
+  let idClient = localStorage.getItem('idClient')
+  const [newPassword, setNewPassword] = useState()
+  const [newRole, setNewRole] = useState(props.User.idRole)
+  const [client, setClient] = useState(props.User.idClient)
+  const [clients, setClients] = useState([])
+  console.log(props.User)
+  let roles = []
+  if (role == 1) {
+    roles.push({ value: 1, name: 'Administrator' })
+  }
+  roles.push({ value: 2, name: 'Supervisor' })
+  roles.push({ value: 3, name: 'Operator' })
+  const handleUserNameChange = (event) => {
     setNewUserName(event.target.value)
   }
+  const handlePasswordChange = (event) => {
+    setNewPassword(event.target.value)
+  }
+  const handleClientChange = (event) => {
+    console.log(event.target.value)
+    setClient(event.target.value)
+  }
+  const handleRoleChange = (event) => {
+    setNewRole(event.target.value)
+  }
+
+  const fetchClients = async () => {
+    let role = localStorage.getItem('role')
+    console.log(role)
+    if (role > 2) {
+      navigate('/Login', { replace: true })
+      localStorage.setItem('token', undefined)
+      localStorage.setItem('role', undefined)
+    } else {
+      let clients = await GetClients()
+      console.log(clients)
+      setClients(clients)
+    }
+  }
+
+  useEffect(() => {
+    fetchClients()
+  }, [])
+
   const updateUser = async () => {
-    //await UpdateUser(props.User, newUserName)
+    let user = props.User
+    user.userName = newUserName
+    user.password = newPassword
+    user.idRole = newRole
+    user.idClient = client
+    await UpdateUser(props.User)
     props.GetUsers()
     setUpdateUserVisible(false)
     props.toast.current.showToast('User updated successfully')
   }
   const deleteUser = async () => {
-    //await DeleteUser(props.User)
+    await DeleteUser(props.User)
     props.GetUsers()
     setDeleteUserVisible(false)
     props.toast.current.showToast('User deleted successfully')
@@ -204,9 +252,46 @@ const TaskUser = (props) => {
         </CModalHeader>
         <CModalBody>
           <CRow>
-            <CCol xs={2}>Name</CCol>
+            <CCol xs={2}>User name</CCol>
             <CCol xs={10}>
-              <CFormInput placeholder="Name" onChange={handleNameChange} value={newUserName} />
+              <CFormInput
+                value={newUserName}
+                placeholder="UserName"
+                onChange={handleUserNameChange}
+              />
+            </CCol>
+            <CCol xs={2}>Password</CCol>
+            <CCol xs={10}>
+              <CFormInput type="password" placeholder="Password" onChange={handlePasswordChange} />
+            </CCol>
+            <CCol xs={2}>Role</CCol>
+            <CCol xs={10}>
+              <CFormSelect
+                value={props.User.idRole}
+                aria-label="Default select example"
+                onChange={handleRoleChange}
+              >
+                {roles.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.name}
+                  </option>
+                ))}
+              </CFormSelect>
+            </CCol>
+            <CCol xs={2}>Client</CCol>
+            <CCol xs={10}>
+              <CFormSelect
+                aria-label="Default select example"
+                value={props.User.idClient}
+                onChange={handleClientChange}
+              >
+                <option value={'00000000-0000-0000-0000-000000000000'}>Select One</option>
+                {clients.map((client) => (
+                  <option key={client.guid} value={client.guid}>
+                    {client.name}
+                  </option>
+                ))}
+              </CFormSelect>
             </CCol>
           </CRow>
         </CModalBody>

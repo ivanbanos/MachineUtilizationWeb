@@ -1,30 +1,12 @@
 import configData from '../config.json'
 
-const AddUsers = async (userName, password, role, idClient) => {
+const UpdateUser = async (User) => {
   try {
     const token = localStorage.getItem('token')
-    const body = {
-      guid: '00000000-0000-0000-0000-000000000000',
-      username: userName,
-      password: password,
-    }
-    if (role == undefined) {
-      body.idRole = 1
-    } else {
-      body.idRole = role
-    }
-
-    console.log(idClient == null)
-    console.log(idClient == undefined)
-
-    if (idClient != 'undefined') {
-      body.idClient = idClient
-    }
-    console.log(body)
-    const response = await fetch(configData.SERVER_URL + '/api/Users/createUser', {
-      method: 'POST',
+    const response = await fetch(configData.SERVER_URL + '/api/Users', {
+      method: 'PUT',
       mode: 'cors',
-      body: JSON.stringify(body),
+      body: JSON.stringify(User),
       headers: {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
@@ -37,8 +19,8 @@ const AddUsers = async (userName, password, role, idClient) => {
       },
     })
     if (response.status == 200) {
-      let user = await response.json()
-      return user
+      let machines = await response.json()
+      return machines
     }
     if (response.status == 403) {
       return 'fail'
@@ -49,4 +31,4 @@ const AddUsers = async (userName, password, role, idClient) => {
   }
 }
 
-export default AddUsers
+export default UpdateUser
