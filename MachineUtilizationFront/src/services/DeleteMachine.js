@@ -1,15 +1,12 @@
 import configData from '../config.json'
 
-const UpdateOperator = async (operator, name) => {
+const DeleteMachine = async (machine) => {
   try {
     const token = localStorage.getItem('token')
-    operator.name = name
-    operator.idUser = '00000000-0000-0000-0000-000000000000'
-    operator.idClient = '00000000-0000-0000-0000-000000000000'
-    const response = await fetch(configData.SERVER_URL + '/api/Operators', {
-      method: 'PUT',
+    const response = await fetch(configData.SERVER_URL + '/api/Machines', {
+      method: 'DELETE',
       mode: 'cors',
-      body: JSON.stringify(operator),
+      body: JSON.stringify(machine),
       headers: {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
@@ -22,8 +19,8 @@ const UpdateOperator = async (operator, name) => {
       },
     })
     if (response.status == 200) {
-      let operators = await response.json()
-      return operators
+      let machine = await response.json()
+      return machine
     }
     if (response.status == 403) {
       return 'fail'
@@ -34,4 +31,4 @@ const UpdateOperator = async (operator, name) => {
   }
 }
 
-export default UpdateOperator
+export default DeleteMachine
