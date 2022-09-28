@@ -1,14 +1,12 @@
 import configData from '../config.json'
 
-const AddOperator = async (operatorName) => {
+const DeleteUser = async (User) => {
   try {
     const token = localStorage.getItem('token')
-    const client = localStorage.getItem('idClient')
-    const body = { name: operatorName, idClient: client }
-    const response = await fetch(configData.SERVER_URL + '/api/Operators/Add/Operator', {
-      method: 'POST',
+    const response = await fetch(configData.SERVER_URL + '/api/Users', {
+      method: 'DELETE',
       mode: 'cors',
-      body: JSON.stringify(body),
+      body: JSON.stringify(User),
       headers: {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
@@ -33,4 +31,4 @@ const AddOperator = async (operatorName) => {
   }
 }
 
-export default AddOperator
+export default DeleteUser

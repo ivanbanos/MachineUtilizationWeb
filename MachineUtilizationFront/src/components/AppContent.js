@@ -32,6 +32,10 @@ const AppContent = () => {
             <Route path=":machineId" element={<UtilizationList />} />
           </Route>
           <Route path="/" element={<Navigate to="dashboard" replace />} />
+          <Route path="/clients" element={<Navigate to="clients" replace />} />
+          <Route path="/machines" element={<Navigate to="machines" replace />} />
+          <Route path="/users" element={<Navigate to="users" replace />} />
+          <Route path="/operator" element={<Navigate to="operator" replace />} />
         </Routes>
       </Suspense>
     </CContainer>

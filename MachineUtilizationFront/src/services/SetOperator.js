@@ -1,15 +1,17 @@
 import configData from '../config.json'
 
-const GetToken = async (username, password) => {
+const SetOperator = async (machine) => {
   try {
+    const token = localStorage.getItem('token')
     const response = await fetch(
-      configData.SERVER_URL + '/api/Users/' + username + '/' + password,
+      configData.SERVER_URL + '/api/Operators/SetToShift/machine/' + machine,
       {
-        method: 'GET',
+        method: 'POST',
         mode: 'cors',
         headers: {
           'Access-Control-Allow-Origin': '*',
           accept: 'text/plain',
+          Authorization: 'Bearer ' + token,
           'sec-fetch-mode': 'cors',
           'Access-Control-Allow-Headers': 'Content-Type',
           'Access-Control-Allow-Origin': 'https://machineutilization.dbhaffnerna3.com',
@@ -18,11 +20,19 @@ const GetToken = async (username, password) => {
       },
     )
     if (response.status == 200) {
-      let json = await response.json()
-      return json
+      let machines = await response.json()
+      return machines
     }
-    return null
-  } catch (error) {}
+    if (response.status == 403) {
+      return 'fail'
+    }
+    if (response.status == 401) {
+      return 'fail'
+    }
+    return 'fail'
+  } catch (error) {
+    return 'fail'
+  }
 }
 
-export default GetToken
+export default SetOperator

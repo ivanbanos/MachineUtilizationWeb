@@ -20,6 +20,9 @@ import '../../../App.css'
 
 const Login = () => {
   let navigate = useNavigate()
+  localStorage.setItem('token', null)
+  localStorage.setItem('role', null)
+  localStorage.setItem('idClient', null)
   const [errorMessages, seterrormessages] = useState({})
   const [first_name, setfirst_name] = useState()
   const [password, setPassword] = useState()
@@ -33,11 +36,16 @@ const Login = () => {
     //Prevent page reload
     event.preventDefault()
     const token = await GetToken(first_name, password)
-    console.log(token)
     // Compare user info
     if (token) {
-      localStorage.setItem('token', token)
-      navigate('/Dashboard', { replace: true })
+      localStorage.setItem('token', token.token)
+      localStorage.setItem('role', token.idRole)
+      localStorage.setItem('idClient', token.idClient)
+      if (token.idRole < 3) {
+        navigate('/Dashboard', { replace: true })
+      } else {
+        navigate('/Operator', { replace: true })
+      }
     } else {
       // Username not found
       seterrormessages({ name: 'password', message: 'Username or Password incorrect' })

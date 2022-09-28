@@ -1,14 +1,15 @@
 import configData from '../config.json'
 
-const AddOperator = async (operatorName) => {
+const UpdateOperator = async (operator, name) => {
   try {
     const token = localStorage.getItem('token')
-    const client = localStorage.getItem('idClient')
-    const body = { name: operatorName, idClient: client }
-    const response = await fetch(configData.SERVER_URL + '/api/Operators/Add/Operator', {
-      method: 'POST',
+    operator.name = name
+    operator.idUser = '00000000-0000-0000-0000-000000000000'
+    operator.idClient = '00000000-0000-0000-0000-000000000000'
+    const response = await fetch(configData.SERVER_URL + '/api/Operators', {
+      method: 'PUT',
       mode: 'cors',
-      body: JSON.stringify(body),
+      body: JSON.stringify(operator),
       headers: {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
@@ -21,8 +22,8 @@ const AddOperator = async (operatorName) => {
       },
     })
     if (response.status == 200) {
-      let machines = await response.json()
-      return machines
+      let operators = await response.json()
+      return operators
     }
     if (response.status == 403) {
       return 'fail'
@@ -33,4 +34,4 @@ const AddOperator = async (operatorName) => {
   }
 }
 
-export default AddOperator
+export default UpdateOperator
