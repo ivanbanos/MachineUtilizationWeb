@@ -2,6 +2,8 @@ import { React, useState, useEffect, useRef } from 'react'
 import 'react-datepicker/dist/react-datepicker.css'
 import GetMachines from '../../services/GetMachines'
 import AddMachine from '../../services/AddMachine'
+import DeleteMachine from 'src/services/DeleteMachine'
+import UpdateMachine from 'src/services/UpdateMachine'
 import { useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilX } from '@coreui/icons'
@@ -76,13 +78,13 @@ const TaskMachine = (props) => {
     setNewMachineName(event.target.value)
   }
   const updateMachine = async () => {
-    //await UpdateMachine(props.Machine, newMachineName)
+    await UpdateMachine(props.Machine, newMachineName)
     props.GetMachines()
     setUpdateMachineVisible(false)
     props.toast.current.showToast('Machine updated successfully')
   }
   const deleteMachine = async () => {
-    //await DeleteMachine(props.Machine)
+    await DeleteMachine(props.Machine)
     props.GetMachines()
     setDeleteMachineVisible(false)
     props.toast.current.showToast('Machine deleted successfully')
