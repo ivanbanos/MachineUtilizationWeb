@@ -23,7 +23,7 @@ const _nav = [
     name: 'Machines',
     to: '/machines',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    level: 2,
+    level: 1,
   },
   {
     component: CNavItem,

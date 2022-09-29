@@ -33,7 +33,8 @@ const AddOperatorModal = (props) => {
     setNewOperatorName(event.target.value)
   }
   const addOperator = async () => {
-    await AddOperator(newOperatorName)
+    const client = localStorage.getItem('idClient')
+    await AddOperator(newOperatorName, client)
     props.GetOperators()
     setAddOperatorVisible(false)
     props.toast.current.showToast('Operator added successfully')
@@ -148,7 +149,7 @@ const Operators = () => {
 
   const fetchOperators = async () => {
     let role = localStorage.getItem('role')
-    if (role > 1) {
+    if (role > 2) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
