@@ -47,8 +47,15 @@ const AverageReport = (props) => {
     <CCol sm={6} lg={3}>
       <CCard style={{ width: '18rem' }}>
         <CCardBody>
-          <CCardTitle>Average/day</CCardTitle>
-          <CCardText> {props.average} </CCardText>
+          <CRow>
+            <CCol md={3} style={{ width: '10rem' }}>
+              <CCardTitle>Average/day</CCardTitle>
+              <CCardText> {props.average} </CCardText>
+            </CCol>
+            <CCol md={3}>
+              <div style={{ backgroundColor: props.color, height: '5rem' }}></div>
+            </CCol>
+          </CRow>
         </CCardBody>
       </CCard>
     </CCol>
@@ -186,7 +193,7 @@ const Summary = () => {
           />
         </CCol>
         <CCol xs={6}>
-          <AverageReport average={productionTimeAverage.toFixed(2)} />
+          <AverageReport average={productionTimeAverage.toFixed(2)} color={'#05A51B'} />
         </CCol>
         <CCol xs={6}>
           <Bar
@@ -216,7 +223,7 @@ const Summary = () => {
           />
         </CCol>
         <CCol xs={6}>
-          <AverageReport average={powerOnAverage.toFixed(2)} />
+          <AverageReport average={powerOnAverage.toFixed(2)} color={'#052CA5'} />
         </CCol>
       </CRow>
     </>
