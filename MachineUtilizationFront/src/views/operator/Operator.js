@@ -1,6 +1,5 @@
 import { React, useState, useEffect, useRef } from 'react'
 import GetMachines from '../../services/GetMachines'
-import AddOperatorToMachineUtilization from '../../services/AddOperatorToMachineUtilization'
 import {
   CRow,
   CCol,
@@ -21,6 +20,7 @@ import { cilOptions, cilCalculator } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import Toast from '../toast/Toast'
+import SetOperator from 'src/services/SetOperator'
 
 const AddUOperatorToMachineUtilization = (props) => {
   let userId = localStorage.getItem('userId')
@@ -29,8 +29,8 @@ const AddUOperatorToMachineUtilization = (props) => {
   const handleHoursChange = (event) => {
     setNewHour(event.target.value)
   }
-  const setOperator = async () => {
-    await AddOperatorToMachineUtilization(userId, props.guid, newHour)
+  const setOperatorToMachine = async () => {
+    await SetOperator(props.guid, newHour)
     setAddUOperatorVisible(false)
     props.toast.current.showToast('Operator setted successfully')
   }
@@ -56,7 +56,7 @@ const AddUOperatorToMachineUtilization = (props) => {
           <CButton color="secondary" onClick={() => setAddUOperatorVisible(false)}>
             Close
           </CButton>
-          <CButton color="primary" onClick={setOperator}>
+          <CButton color="primary" onClick={setOperatorToMachine}>
             Add
           </CButton>
         </CModalFooter>

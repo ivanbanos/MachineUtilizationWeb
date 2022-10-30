@@ -1,10 +1,10 @@
 import configData from '../config.json'
 
-const SetOperator = async (machine) => {
+const SetOperator = async (machine, hours) => {
   try {
     const token = localStorage.getItem('token')
     const response = await fetch(
-      configData.SERVER_URL + '/api/Operators/SetToShift/machine/' + machine,
+      configData.SERVER_URL + '/api/Operators/SetToShift/machine/' + machine + '/hours/' + hours,
       {
         method: 'POST',
         mode: 'cors',
