@@ -89,6 +89,7 @@ const Summary = () => {
       machineId,
       moment(strat).format('MM-DD-YYYY'),
       moment(end).format('MM-DD-YYYY'),
+      operator,
     )
     console.log(response)
     if (response == 'fail') {
