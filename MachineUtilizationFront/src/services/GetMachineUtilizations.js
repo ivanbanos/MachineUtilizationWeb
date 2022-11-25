@@ -1,6 +1,6 @@
 import configData from '../config.json'
 
-const GetMachineUtilizations = async (machine, stratDate, endDate, operator) => {
+const GetMachineUtilizations = async (machine, stratDate, endDate) => {
   try {
     const token = localStorage.getItem('token')
     const response = await fetch(
@@ -11,8 +11,7 @@ const GetMachineUtilizations = async (machine, stratDate, endDate, operator) => 
         stratDate +
         '/end/' +
         endDate +
-        '/Operator/' +
-        operator,
+        '/Operator/00000000-0000-0000-0000-000000000000',
       {
         method: 'GET',
         mode: 'cors',

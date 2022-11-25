@@ -41,6 +41,7 @@ const Login = () => {
       localStorage.setItem('token', token.token)
       localStorage.setItem('role', token.idRole)
       localStorage.setItem('idClient', token.idClient)
+      localStorage.setItem('userId', token.userId)
       if (token.idRole < 3) {
         navigate('/Dashboard', { replace: true })
       } else {

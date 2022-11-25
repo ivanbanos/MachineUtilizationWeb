@@ -1,6 +1,5 @@
 import { React, useState, useEffect, useRef } from 'react'
 import GetMachines from '../../services/GetMachines'
-import SetOperator from '../../services/SetOperator'
 import {
   CRow,
   CCol,
@@ -10,18 +9,63 @@ import {
   CDropdownToggle,
   CWidgetStatsA,
   CButton,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CModalHeader,
+  CModalTitle,
+  CFormInput,
 } from '@coreui/react'
 import { cilOptions, cilCalculator } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import Toast from '../toast/Toast'
+import SetOperator from 'src/services/SetOperator'
 
-const MachinesDropdown = (props) => {
-  const setOperator = async () => {
-    await SetOperator(props.guid)
-
+const AddUOperatorToMachineUtilization = (props) => {
+  let userId = localStorage.getItem('userId')
+  const [addOperatorVisible, setAddUOperatorVisible] = useState(false)
+  const [newHour, setNewHour] = useState()
+  const handleHoursChange = (event) => {
+    setNewHour(event.target.value)
+  }
+  const setOperatorToMachine = async () => {
+    await SetOperator(props.guid, newHour)
+    setAddUOperatorVisible(false)
     props.toast.current.showToast('Operator setted successfully')
   }
+
+  return (
+    <>
+      <CButton style={{ margin: '2pt' }} onClick={() => setAddUOperatorVisible(true)}>
+        +
+      </CButton>
+      <CModal visible={addOperatorVisible} onClose={() => setAddUOperatorVisible(false)}>
+        <CModalHeader>
+          <CModalTitle>Set as operator for the shift</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <CRow>
+            <CCol xs={2}>Hours</CCol>
+            <CCol xs={10}>
+              <CFormInput placeholder="Hours" onChange={handleHoursChange} />
+            </CCol>
+          </CRow>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setAddUOperatorVisible(false)}>
+            Close
+          </CButton>
+          <CButton color="primary" onClick={setOperatorToMachine}>
+            Add
+          </CButton>
+        </CModalFooter>
+      </CModal>
+    </>
+  )
+}
+
+const MachinesDropdown = (props) => {
   return (
     <CCol sm={6} lg={3}>
       <CWidgetStatsA
@@ -35,16 +79,10 @@ const MachinesDropdown = (props) => {
         }
         title={props.guid}
         action={
-          <CDropdown alignment="end">
-            <CDropdownToggle color="transparent" caret={false} className="p-0">
-              <CIcon icon={cilOptions} className="text-high-emphasis-inverse" />
-            </CDropdownToggle>
-            <CDropdownMenu>
-              <CDropdownItem>
-                <CButton onClick={setOperator}>Set as operator for the shift</CButton>
-              </CDropdownItem>
-            </CDropdownMenu>
-          </CDropdown>
+          <AddUOperatorToMachineUtilization
+            toast={props.toast}
+            guid={props.guid}
+          ></AddUOperatorToMachineUtilization>
         }
       />
     </CCol>
