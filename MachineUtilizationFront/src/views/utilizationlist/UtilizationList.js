@@ -4,10 +4,11 @@ import { useParams } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import GetMachines from '../../services/GetMachines'
-import GetListOperators from '../../services/GetListOperators'
 import AddOperatorToMachineUtilization from '../../services/AddOperatorToMachineUtilization'
 import * as moment from 'moment'
 import { useNavigate } from 'react-router-dom'
+import CIcon from '@coreui/icons-react'
+import { cilPlus, cilEye, cilMagnifyingGlass } from '@coreui/icons'
 import {
   CButton,
   CRow,
@@ -32,34 +33,40 @@ import {
 
 import Toast from '../toast/Toast'
 
-const MachineOperator = (props) => {
-  const [operatorSelected, setOperator] = useState(props.selected)
-
-  const addOperatorToMachineUtilization = async (operator) => {
-    console.log(props.machineUtilizationId)
-    await AddOperatorToMachineUtilization(operator, props.machineUtilizationId)
-  }
-
-  const handleOperatorChange = (event) => {
-    setOperator(event.target.value)
-    addOperatorToMachineUtilization(event.target.value)
-    props.toast.current.showToast('Operator changed successfully')
-  }
-
+const AddUOperatorToMachineUtilization = (props) => {
+  let role = localStorage.getItem('role')
+  const [addOperatorVisible, setAddUOperatorVisible] = useState(false)
   return (
     <>
-      <CFormSelect
-        aria-label="Default select example"
-        value={operatorSelected}
-        onChange={handleOperatorChange}
-      >
-        <option value={'00000000-0000-0000-0000-000000000000'}>Select One</option>
-        {props.operators.map((operator) => (
-          <option key={operator.guid} value={operator.guid}>
-            {operator.name}
-          </option>
-        ))}
-      </CFormSelect>
+      <CButton style={{ margin: '2pt' }} onClick={() => setAddUOperatorVisible(true)}>
+        <CIcon icon={cilMagnifyingGlass} size="m" />
+      </CButton>
+      <CModal visible={addOperatorVisible} onClose={() => setAddUOperatorVisible(false)}>
+        <CModalHeader>
+          <CModalTitle>Machine Shift Detail</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <CRow>
+            <CTable>
+              <CTableHead>
+                <CTableRow>
+                  <CTableHeaderCell scope="col">Day</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Power On</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Power Off</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Production time</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Idle time</CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody></CTableBody>
+            </CTable>
+          </CRow>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setAddUOperatorVisible(false)}>
+            Close
+          </CButton>
+        </CModalFooter>
+      </CModal>
     </>
   )
 }
@@ -69,16 +76,9 @@ const UtilizationList = () => {
   let { machineId } = useParams()
   const [strat, setStart] = useState(new Date())
   const [end, setEnd] = useState(new Date())
-  const [operator, setOperator] = useState('00000000-0000-0000-0000-000000000000')
   const [machineUtilizations, setMachineUtilizations] = useState([])
   const [machine, setMachine] = useState({ name: '' })
-  const [operators, setOperators] = useState([])
   const toastRef = useRef()
-
-  const getListOperators = async (machine) => {
-    let operators = await GetListOperators(machine.idClient)
-    setOperators(operators)
-  }
 
   const fetchMachineUtilizations = async () => {
     let machines = await GetMachines()
@@ -87,7 +87,6 @@ const UtilizationList = () => {
       machineId,
       moment(strat).format('MM-DD-YYYY'),
       moment(end).format('MM-DD-YYYY'),
-      operator,
     )
     if (response == 'fail') {
       navigate('/Login', { replace: true })
@@ -95,16 +94,11 @@ const UtilizationList = () => {
       console.log(machineUtilizations.map((machine) => machine.date))
       setMachineUtilizations(response)
     }
-    await getListOperators(machines.filter((element) => element.guid >= machineId)[0])
   }
 
   useEffect(() => {
     fetchMachineUtilizations()
   }, [])
-
-  const handleOperatorChange = (event) => {
-    setOperator(event.target.value)
-  }
 
   return (
     <>
@@ -130,23 +124,6 @@ const UtilizationList = () => {
                   <CCol style={{ margin: '2pt' }} xs={10}>
                     <DatePicker selected={end} onChange={(date) => setEnd(date)} />
                   </CCol>
-                  <CCol style={{ margin: '2pt' }} xs={2}>
-                    Operator
-                  </CCol>
-                  <CCol style={{ margin: '2pt' }} xs={10}>
-                    <CFormSelect
-                      aria-label="Default select example"
-                      value={operator}
-                      onChange={handleOperatorChange}
-                    >
-                      <option value={'00000000-0000-0000-0000-000000000000'}>Select One</option>
-                      {operators.map((operator) => (
-                        <option key={operator.guid} value={operator.guid}>
-                          {operator.name}
-                        </option>
-                      ))}
-                    </CFormSelect>
-                  </CCol>
                 </CRow>
               </CCardText>
               <CButton
@@ -170,7 +147,7 @@ const UtilizationList = () => {
               <CTableHeaderCell scope="col">Power Off</CTableHeaderCell>
               <CTableHeaderCell scope="col">Production time</CTableHeaderCell>
               <CTableHeaderCell scope="col">Idle time</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Operator</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Detail</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
@@ -190,12 +167,10 @@ const UtilizationList = () => {
                 <CTableHeaderCell>{machineUtilization.productionTime.toFixed(2)}</CTableHeaderCell>
                 <CTableHeaderCell>{machineUtilization.idleTime.toFixed(2)}</CTableHeaderCell>
                 <CTableHeaderCell>
-                  <MachineOperator
-                    operators={operators}
-                    selected={machineUtilization.operator}
+                  <AddUOperatorToMachineUtilization
                     machineUtilizationId={machineUtilization.guid}
                     toast={toastRef}
-                  ></MachineOperator>
+                  ></AddUOperatorToMachineUtilization>
                 </CTableHeaderCell>
               </CTableRow>
             ))}

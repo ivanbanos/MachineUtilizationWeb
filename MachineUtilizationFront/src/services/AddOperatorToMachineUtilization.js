@@ -1,6 +1,6 @@
 import configData from '../config.json'
 
-const AddOperatorToMachineUtilization = async (operator, machineUtilization) => {
+const AddOperatorToMachineUtilization = async (operator, machineUtilization, hours) => {
   try {
     const token = localStorage.getItem('token')
     const response = await fetch(
@@ -8,7 +8,9 @@ const AddOperatorToMachineUtilization = async (operator, machineUtilization) => 
         '/api/Operators/Add/Operator/' +
         operator +
         '/MacihneUtilization/' +
-        machineUtilization,
+        machineUtilization +
+        '/Hours/' +
+        hours,
       {
         method: 'POST',
         mode: 'cors',
