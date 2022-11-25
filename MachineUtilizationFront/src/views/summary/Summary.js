@@ -84,7 +84,7 @@ const Summary = () => {
   const fetchMachineUtilizations = async () => {
     let machines = await GetMachines()
     console.log(machines)
-    setMachine(machines.filter((element) => element.guid >= machineId)[0])
+    setMachine(machines.filter((element) => element.guid == machineId)[0])
     let response = await GetMachineUtilizations(
       machineId,
       moment(strat).format('MM-DD-YYYY'),

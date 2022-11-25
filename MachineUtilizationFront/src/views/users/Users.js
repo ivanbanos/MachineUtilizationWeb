@@ -127,6 +127,7 @@ const AddUserModal = (props) => {
             <CCol xs={2}>Role</CCol>
             <CCol xs={10}>
               <CFormSelect aria-label="Default select example" onChange={handleRoleChange}>
+                <option value={0}>Select One</option>
                 {roles.map((role) => (
                   <option key={role.value} value={role.value}>
                     {role.name}
@@ -202,6 +203,7 @@ const TaskUser = (props) => {
     setClient(event.target.value)
   }
   const handleRoleChange = (event) => {
+    console.log(event.target.value)
     setNewRole(event.target.value)
   }
 
@@ -267,7 +269,7 @@ const TaskUser = (props) => {
             <CCol xs={2}>Role</CCol>
             <CCol xs={10}>
               <CFormSelect
-                value={props.User.idRole}
+                value={newRole}
                 aria-label="Default select example"
                 onChange={handleRoleChange}
               >
@@ -282,7 +284,7 @@ const TaskUser = (props) => {
             <CCol xs={10}>
               <CFormSelect
                 aria-label="Default select example"
-                value={props.User.idClient}
+                value={client}
                 onChange={handleClientChange}
               >
                 <option value={'00000000-0000-0000-0000-000000000000'}>Select One</option>
