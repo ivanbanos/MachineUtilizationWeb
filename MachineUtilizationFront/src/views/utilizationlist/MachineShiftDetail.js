@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilEye, cilMagnifyingGlass } from '@coreui/icons'
 import GetShiftDetail from 'src/services/GetShiftDetail'
+import GetAllOperators from '../../services/GetAllOperators'
 import {
   CButton,
   CRow,
@@ -33,20 +34,33 @@ import {
 
 import Toast from '../toast/Toast'
 import GetMachineUtilizationInformation from 'src/services/GetMachineUtilizationInformation'
-import SetOperator from 'src/services/SetOperator'
 
 const AddUOperatorToMachineUtilization = (props) => {
   let userId = localStorage.getItem('userId')
   const [addOperatorVisible, setAddUOperatorVisible] = useState(false)
+  const [operators, setOperators] = useState([])
+  const [operator, setOperator] = useState()
   const [newHour, setNewHour] = useState()
   const handleHoursChange = (event) => {
     setNewHour(event.target.value)
   }
   const setOperatorToMachine = async () => {
-    await SetOperator(props.guid, newHour)
+    await AddOperatorToMachineUtilization(operator, props.guid, newHour)
     setAddUOperatorVisible(false)
     props.toast.current.showToast('Operator setted successfully')
   }
+  const fetchOperators = async () => {
+    let operators = await GetAllOperators()
+    setOperators(operators)
+  }
+
+  const handleOperatorChange = (event) => {
+    setOperator(event.target.value)
+  }
+
+  useEffect(() => {
+    fetchOperators()
+  }, [])
 
   return (
     <>
@@ -62,6 +76,23 @@ const AddUOperatorToMachineUtilization = (props) => {
           <CModalTitle>Set as operator for the shift</CModalTitle>
         </CModalHeader>
         <CModalBody>
+          <CRow>
+            <CCol xs={2}>Operators</CCol>
+            <CCol xs={10}>
+              <CFormSelect
+                aria-label="Default select example"
+                GetOperators={fetchOperators}
+                onChange={handleOperatorChange}
+              >
+                <option>Select Operator</option>
+                {operators.map((operator) => (
+                  <option value={operator.guid} key={operator.guid}>
+                    {operator.name}
+                  </option>
+                ))}
+              </CFormSelect>
+            </CCol>
+          </CRow>
           <CRow>
             <CCol xs={2}>Hours</CCol>
             <CCol xs={10}>
@@ -91,7 +122,6 @@ const MachineShiftDetail = () => {
 
   const fetchShiftDetail = async () => {
     let machineUtilization = await GetMachineUtilizationInformation(machineUtilizationId)
-    console.log(machineUtilization)
     setMachineUtilization(machineUtilization)
     let response = await GetShiftDetail(machineUtilizationId)
     if (response == 'fail') {
