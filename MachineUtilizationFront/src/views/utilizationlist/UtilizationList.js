@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import GetMachines from '../../services/GetMachines'
-import AddOperatorToMachineUtilization from '../../services/AddOperatorToMachineUtilization'
 import * as moment from 'moment'
 import { useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
@@ -33,40 +32,16 @@ import {
 
 import Toast from '../toast/Toast'
 
-const AddUOperatorToMachineUtilization = (props) => {
-  let role = localStorage.getItem('role')
-  const [addOperatorVisible, setAddUOperatorVisible] = useState(false)
+const SeeShiftDetail = (props) => {
+  let navigate = useNavigate()
   return (
     <>
-      <CButton style={{ margin: '2pt' }} onClick={() => setAddUOperatorVisible(true)}>
+      <CButton
+        style={{ margin: '2pt' }}
+        onClick={() => navigate('/MachineShiftDetail/' + props.machineUtilizationId)}
+      >
         <CIcon icon={cilMagnifyingGlass} size="m" />
       </CButton>
-      <CModal visible={addOperatorVisible} onClose={() => setAddUOperatorVisible(false)}>
-        <CModalHeader>
-          <CModalTitle>Machine Shift Detail</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <CRow>
-            <CTable>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell scope="col">Day</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Power On</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Power Off</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Production time</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Idle time</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody></CTableBody>
-            </CTable>
-          </CRow>
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setAddUOperatorVisible(false)}>
-            Close
-          </CButton>
-        </CModalFooter>
-      </CModal>
     </>
   )
 }
@@ -167,10 +142,10 @@ const UtilizationList = () => {
                 <CTableHeaderCell>{machineUtilization.productionTime.toFixed(2)}</CTableHeaderCell>
                 <CTableHeaderCell>{machineUtilization.idleTime.toFixed(2)}</CTableHeaderCell>
                 <CTableHeaderCell>
-                  <AddUOperatorToMachineUtilization
+                  <SeeShiftDetail
                     machineUtilizationId={machineUtilization.guid}
                     toast={toastRef}
-                  ></AddUOperatorToMachineUtilization>
+                  ></SeeShiftDetail>
                 </CTableHeaderCell>
               </CTableRow>
             ))}
