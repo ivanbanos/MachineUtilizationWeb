@@ -47,7 +47,7 @@ const WatchCameraModal = (props) => {
                 className="embed-responsive-item"
                 width="560"
                 height="315"
-                src="https://www.youtube.com/embed/a5rlgE6dcBY"
+                src="https://alexxit.github.io/go2rtc/#share=3Fvh54BTl7&pwd=lgbhwbmJVd&media=video+audio"
                 title="YouTube video player"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -228,7 +228,7 @@ const Cameras = () => {
                 </CTableRow>
               ))} */}
             <CTableRow>
-              <CTableHeaderCell>Prueba 1</CTableHeaderCell>
+              <CTableHeaderCell>Camera 1</CTableHeaderCell>
               <TaskCamera />
               {/* <CTableHeaderCell>
                 <CButton style={{ margin: '2pt' }}>
