@@ -140,9 +140,17 @@ const TaskCamera = (props) => {
 
 const AddCameraModal = (props) => {
   const [addCameraVisible, setAddCameraVisible] = useState(false)
-  const [newCameraName, setNewCameraName] = useState()
-  const handleNameChange = (event) => {
-    setNewCameraName(event.target.value)
+  const [cameraInfo, setCameraInfo] = useState({
+    name: '',
+    user: '',
+    password: '',
+  })
+  const handleImputChange = (event) => {
+    const newCameraInfo = {
+      ...cameraInfo,
+      [event.target.name]: event.target.value,
+    }
+    setCameraInfo(newCameraInfo)
   }
   // const addOperator = async () => {
   //   const client = localStorage.getItem('idClient')
@@ -165,7 +173,20 @@ const AddCameraModal = (props) => {
           <CRow>
             <CCol xs={2}>Name</CCol>
             <CCol xs={10}>
-              <CFormInput placeholder="Name" onChange={handleNameChange} />
+              <CFormInput placeholder="Name" onChange={handleImputChange} name="name" />
+            </CCol>
+            <CCol xs={2}>User</CCol>
+            <CCol xs={10}>
+              <CFormInput placeholder="User" onChange={handleImputChange} name="user" />
+            </CCol>
+            <CCol xs={2}>Password</CCol>
+            <CCol xs={10}>
+              <CFormInput
+                placeholder="Password"
+                onChange={handleImputChange}
+                name="password"
+                type="password"
+              />
             </CCol>
           </CRow>
         </CModalBody>
