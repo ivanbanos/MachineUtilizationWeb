@@ -1,6 +1,10 @@
 import { React, useState, useEffect, useRef } from 'react'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useNavigate } from 'react-router-dom'
+import AddCamera from 'src/services/AddCamera'
+import GetCameras from 'src/services/GetCameras'
+import UpdateCamera from 'src/services/UpdateCamera'
+import DeleteCamera from 'src/services/DeleteCamera'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilX, cilVideo, cilTv } from '@coreui/icons'
 import {
@@ -20,12 +24,22 @@ import {
   CModalTitle,
   CFormSelect,
   CEmbed,
+  CListGroup,
 } from '@coreui/react'
 
 import Toast from '../toast/Toast'
+import configData from '../../config.json'
 
 const WatchCameraModal = (props) => {
   const [watchCameraVisible, setWatchCameraVisible] = useState(false)
+  const userName = props.camera.user
+  const password = props.camera.password
+  const cameraUrl = configData.CAMERA_URL.replace('%USER_NAME%', userName).replace(
+    '%PASSWORD%',
+    password,
+  )
+
+  console.log(cameraUrl) // Imprime la URL dinámica resultante
 
   return (
     <>
@@ -47,8 +61,8 @@ const WatchCameraModal = (props) => {
                 className="embed-responsive-item"
                 width="560"
                 height="315"
-                src="https://alexxit.github.io/go2rtc/#share=3Fvh54BTl7&pwd=lgbhwbmJVd&media=video+audio"
-                title="YouTube video player"
+                src={cameraUrl}
+                title="Machine Utilization"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
@@ -74,18 +88,18 @@ const TaskCamera = (props) => {
   const handleNameChange = (event) => {
     setNewCameraName(event.target.value)
   }
-  // const updateOperator = async () => {
-  //   await UpdateOperator(props.Operator, newOperatorName)
-  //   props.GetOperators()
-  //   setUpdateOperatorVisible(false)
-  //   props.toast.current.showToast('Operator updated successfully')
-  // }
-  // const deleteOperator = async () => {
-  //   await DeleteOperator(props.Operator)
-  //   props.GetOperators()
-  //   setDeleteOperatorVisible(false)
-  //   props.toast.current.showToast('Operator deleted successfully')
-  // }
+  const updateCamera = async () => {
+    await UpdateCamera(props.camera, newCameraName)
+    props.GetCameras()
+    setUpdateCameraVisible(false)
+    props.toast.current.showToast('Camera updated successfully')
+  }
+  const deleteCamera = async () => {
+    await DeleteCamera(props.camera)
+    props.GetCameras()
+    setDeleteCameraVisible(false)
+    props.toast.current.showToast('Camera deleted successfully')
+  }
 
   return (
     <>
@@ -110,7 +124,9 @@ const TaskCamera = (props) => {
           <CButton color="secondary" onClick={() => setUpdateCameraVisible(false)}>
             Close
           </CButton>
-          <CButton color="primary">Update</CButton>
+          <CButton color="primary" onClick={updateCamera}>
+            Update
+          </CButton>
         </CModalFooter>
       </CModal>
       <CTableHeaderCell>
@@ -131,34 +147,40 @@ const TaskCamera = (props) => {
           <CButton color="secondary" onClick={() => setDeleteCameraVisible(false)}>
             Close
           </CButton>
-          <CButton color="primary">Delete</CButton>
+          <CButton color="primary" onClick={deleteCamera}>
+            Delete
+          </CButton>
         </CModalFooter>
       </CModal>
+      <CTableHeaderCell>
+        <WatchCameraModal camera={props.camera} />
+      </CTableHeaderCell>
     </>
   )
 }
 
 const AddCameraModal = (props) => {
   const [addCameraVisible, setAddCameraVisible] = useState(false)
-  const [cameraInfo, setCameraInfo] = useState({
-    name: '',
-    user: '',
-    password: '',
-  })
-  const handleImputChange = (event) => {
-    const newCameraInfo = {
-      ...cameraInfo,
-      [event.target.name]: event.target.value,
-    }
-    setCameraInfo(newCameraInfo)
+  const [cameraName, setCameraName] = useState('')
+  const [cameraUser, setCameraUser] = useState('')
+  const [cameraPassword, setCameraPassword] = useState('')
+  const handleCameraNameChange = (event) => {
+    setCameraName(event.target.value)
   }
-  // const addOperator = async () => {
-  //   const client = localStorage.getItem('idClient')
-  //   await AddOperator(newOperatorName, client)
-  //   props.GetOperators()
-  //   setAddOperatorVisible(false)
-  //   props.toast.current.showToast('Operator added successfully')
-  // }
+  const handleCameraPasswordChange = (event) => {
+    setCameraPassword(event.target.value)
+  }
+  const handleCameraUserChange = (event) => {
+    setCameraUser(event.target.value)
+  }
+
+  const addCamera = async () => {
+    const machineId = props.machineId
+    await AddCamera(cameraName, cameraUser, cameraPassword, machineId)
+    props.GetCameras()
+    setAddCameraVisible(false)
+    props.toast.current.showToast('Camera added successfully')
+  }
 
   return (
     <>
@@ -173,17 +195,17 @@ const AddCameraModal = (props) => {
           <CRow>
             <CCol xs={2}>Name</CCol>
             <CCol xs={10}>
-              <CFormInput placeholder="Name" onChange={handleImputChange} name="name" />
+              <CFormInput placeholder="Name" onChange={handleCameraNameChange} name="name" />
             </CCol>
             <CCol xs={2}>User</CCol>
             <CCol xs={10}>
-              <CFormInput placeholder="User" onChange={handleImputChange} name="user" />
+              <CFormInput placeholder="User" onChange={handleCameraUserChange} name="user" />
             </CCol>
             <CCol xs={2}>Password</CCol>
             <CCol xs={10}>
               <CFormInput
                 placeholder="Password"
-                onChange={handleImputChange}
+                onChange={handleCameraPasswordChange}
                 name="password"
                 type="password"
               />
@@ -194,39 +216,41 @@ const AddCameraModal = (props) => {
           <CButton color="secondary" onClick={() => setAddCameraVisible(false)}>
             Close
           </CButton>
-          <CButton color="primary">Add</CButton>
+          <CButton color="primary" onClick={addCamera}>
+            Add
+          </CButton>
         </CModalFooter>
       </CModal>
     </>
   )
 }
 
-const Cameras = () => {
-  // let navigate = useNavigate()
-  // const [operators, setOperators] = useState([])
-  // const toastRef = useRef()
+const Cameras = (props) => {
+  let navigate = useNavigate()
+  const [cameras, setCameras] = useState([])
+  const toastRef = useRef()
 
-  // const fetchOperators = async () => {
-  //   let role = localStorage.getItem('role')
-  //   if (role > 2) {
-  //     navigate('/Login', { replace: true })
-  //     localStorage.setItem('token', undefined)
-  //     localStorage.setItem('role', undefined)
-  //   }
-  //   let operators = await GetAllOperators()
+  const fetchCameras = async () => {
+    let role = localStorage.getItem('role')
+    if (role > 2) {
+      navigate('/Login', { replace: true })
+      localStorage.setItem('token', undefined)
+      localStorage.setItem('role', undefined)
+    }
+    let cameras = await GetCameras(props.machineId)
 
-  //   setOperators(operators)
-  // }
+    setCameras(cameras)
+  }
 
-  // useEffect(() => {
-  //   fetchOperators()
-  // }, [])
+  useEffect(() => {
+    fetchCameras()
+  }, [])
 
   return (
     <>
-      {/* <Toast ref={toastRef}></Toast> */}
+      <Toast ref={toastRef}></Toast>
       <h2>Cameras</h2>
-      <AddCameraModal />
+      <AddCameraModal machineId={props.machineId} GetCameras={fetchCameras} toast={toastRef} />
       <CRow>
         <CTable>
           <CTableHead>
@@ -236,35 +260,20 @@ const Cameras = () => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {/* {operators.map((operator) => (
-                <CTableRow key={operator.guid}>
-                  <CTableHeaderCell>{operator.name}</CTableHeaderCell>
-                  <CTableHeaderCell>
-                    <TaskOperator
-                      GetOperators={fetchOperators}
-                      toast={toastRef}
-                      Operator={operator}
-                    />
-                  </CTableHeaderCell>
-                </CTableRow>
-              ))} */}
-            <CTableRow>
-              <CTableHeaderCell>Camera 1</CTableHeaderCell>
-              <TaskCamera />
-              {/* <CTableHeaderCell>
-                <CButton style={{ margin: '2pt' }}>
-                  <CIcon icon={cilPencil} size="m" />
-                </CButton>
-              </CTableHeaderCell>
-              <CTableHeaderCell>
-                <CButton style={{ margin: '2pt' }}>
-                  <CIcon icon={cilX} size="m" />
-                </CButton>
-              </CTableHeaderCell> */}
-              <CTableHeaderCell>
-                <WatchCameraModal />
-              </CTableHeaderCell>
-            </CTableRow>
+            {cameras.map((camera) => (
+              <CTableRow key={camera.guid}>
+                <CTableHeaderCell>{camera.name}</CTableHeaderCell>
+                <CTableHeaderCell>
+                  <TaskCamera
+                    GetCameras={fetchCameras}
+                    toast={toastRef}
+                    camera={camera}
+                    machineId={props.machineId}
+                  ></TaskCamera>
+                </CTableHeaderCell>
+              </CTableRow>
+            ))}
+            <CTableRow></CTableRow>
           </CTableBody>
         </CTable>
       </CRow>

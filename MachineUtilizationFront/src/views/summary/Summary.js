@@ -232,7 +232,7 @@ const Summary = () => {
           </CRow>
         </CCol>
         <CCol lg={3}>
-          <Cameras></Cameras>
+          <Cameras machineId={machineId}></Cameras>
         </CCol>
       </CRow>
     </>
