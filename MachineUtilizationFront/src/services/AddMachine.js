@@ -1,9 +1,9 @@
 import configData from '../config.json'
 
-const AddMachine = async (name) => {
+const AddMachine = async (name, idClient) => {
   try {
     const token = localStorage.getItem('token')
-    const body = { name: name, guid: '00000000-0000-0000-0000-000000000000' }
+    const body = { name: name, guid: '00000000-0000-0000-0000-000000000000', idClient: idClient }
     const response = await fetch(configData.SERVER_URL + '/api/Machines/createMachine', {
       method: 'POST',
       mode: 'cors',

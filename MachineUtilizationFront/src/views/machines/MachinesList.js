@@ -1,6 +1,7 @@
 import { React, useState, useEffect, useRef } from 'react'
 import 'react-datepicker/dist/react-datepicker.css'
 import GetMachines from '../../services/GetMachines'
+import GetClients from '../../services/GetClients'
 import AddMachine from '../../services/AddMachine'
 import DeleteMachine from 'src/services/DeleteMachine'
 import UpdateMachine from 'src/services/UpdateMachine'
@@ -22,6 +23,7 @@ import {
   CModalFooter,
   CModalHeader,
   CModalTitle,
+  CFormSelect,
 } from '@coreui/react'
 
 import Toast from '../toast/Toast'
@@ -29,16 +31,29 @@ import Toast from '../toast/Toast'
 const AddMachineModal = (props) => {
   const [addMachineVisible, setAddMachineVisible] = useState(false)
   const [newMachineName, setNewMachineName] = useState()
+  const [clientSelect, setClientSelect] = useState()
+  const [clientList, setClientList] = useState([])
   const handleNameChange = (event) => {
     setNewMachineName(event.target.value)
   }
+  const handleClientChange = (event) => {
+    setClientSelect(event.target.value)
+  }
   const addMachine = async () => {
-    await AddMachine(newMachineName)
+    await AddMachine(newMachineName, clientSelect)
     props.GetMachines()
     setAddMachineVisible(false)
     props.toast.current.showToast('Machine added successfully')
   }
 
+  const fetchClients = async () => {
+    console.log('fetchclientes')
+    let clients = await GetClients()
+    setClientList(clients)
+  }
+  useEffect(() => {
+    fetchClients()
+  }, [])
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setAddMachineVisible(true)}>
@@ -53,6 +68,23 @@ const AddMachineModal = (props) => {
             <CCol xs={2}>Name</CCol>
             <CCol xs={10}>
               <CFormInput placeholder="Name" onChange={handleNameChange} />
+            </CCol>
+          </CRow>
+          <CRow className="py-2">
+            <CCol xs={2}>Client</CCol>
+            <CCol xs={10}>
+              <CFormSelect
+                placeholder="Client"
+                onChange={handleClientChange}
+                aria-label="Default select example"
+                // value={selectedValue}
+              >
+                {clientList.map((client, index) => (
+                  <option key={index} value={client.guid}>
+                    {client.name}
+                  </option>
+                ))}
+              </CFormSelect>
             </CCol>
           </CRow>
         </CModalBody>
@@ -172,6 +204,7 @@ const MachinesList = () => {
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell scope="col">Name</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Client</CTableHeaderCell>
               <CTableHeaderCell scope="col"></CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -179,6 +212,7 @@ const MachinesList = () => {
             {Machines.map((Machine) => (
               <CTableRow key={Machine.guid}>
                 <CTableHeaderCell>{Machine.name}</CTableHeaderCell>
+                <CTableHeaderCell>{Machine.clientName}</CTableHeaderCell>
                 <CTableHeaderCell>
                   <TaskMachine GetMachines={fetchMachines} toast={toastRef} Machine={Machine} />
                 </CTableHeaderCell>
