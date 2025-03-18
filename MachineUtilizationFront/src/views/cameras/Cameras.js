@@ -260,19 +260,20 @@ const Cameras = (props) => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {cameras.map((camera) => (
-              <CTableRow key={camera.guid}>
-                <CTableHeaderCell>{camera.name}</CTableHeaderCell>
-                <CTableHeaderCell>
-                  <TaskCamera
-                    GetCameras={fetchCameras}
-                    toast={toastRef}
-                    camera={camera}
-                    machineId={props.machineId}
-                  ></TaskCamera>
-                </CTableHeaderCell>
-              </CTableRow>
-            ))}
+            {Array.isArray(cameras) &&
+              cameras.map((camera) => (
+                <CTableRow key={camera.guid}>
+                  <CTableHeaderCell>{camera.name}</CTableHeaderCell>
+                  <CTableHeaderCell>
+                    <TaskCamera
+                      GetCameras={fetchCameras}
+                      toast={toastRef}
+                      camera={camera}
+                      machineId={props.machineId}
+                    ></TaskCamera>
+                  </CTableHeaderCell>
+                </CTableRow>
+              ))}
             <CTableRow></CTableRow>
           </CTableBody>
         </CTable>
