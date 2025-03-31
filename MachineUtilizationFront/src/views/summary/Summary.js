@@ -6,6 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import GetMachines from '../../services/GetMachines'
 import GetListOperators from '../../services/GetListOperators'
 import Cameras from '../cameras/Cameras'
+import DayDetailModal from '../dayDetail/DayDetailModal'
 import * as moment from 'moment'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -74,29 +75,35 @@ const Summary = () => {
   const [machine, setMachine] = useState({ name: '' })
   const [operator, setOperator] = useState('00000000-0000-0000-0000-000000000000')
   const [operators, setOperators] = useState([])
+  const [dayDetailModalVisible, setDayDetailModalVisible] = useState(false)
+  const handleSetDayDetailVisible = (stateDayDetailVisible) => {
+    setDayDetailModalVisible(stateDayDetailVisible)
+  }
+  const [dayDetailSelect, setDayDetailSelect] = useState([])
+  const [rangeDayDetailSelect, setRangeDayDetailSelect] = useState([])
 
   const getListOperators = async (machine) => {
-    console.log(machine)
     let operators = await GetListOperators(machine.idClient)
-    console.log(operators)
+
     setOperators(operators)
   }
 
   const fetchMachineUtilizations = async () => {
     let machines = await GetMachines()
-    console.log(machines)
+
     setMachine(machines.filter((element) => element.guid == machineId)[0])
     let response = await GetMachineUtilizations(
       machineId,
       moment(strat).format('MM-DD-YYYY'),
       moment(end).format('MM-DD-YYYY'),
       operator,
+      false,
     )
-    console.log(response)
+
     if (response == 'fail') {
       navigate('/Login', { replace: true })
     } else {
-      console.log(machineUtilizations.map((machine) => machine.date))
+      // console.log(machineUtilizations.map((machine) => machine.date))
       setMachineUtilizations(response)
       setProductionTimeAverage(
         response.reduce((sum, machine) => sum + Number(machine.productionTime), 0) /
@@ -173,9 +180,67 @@ const Summary = () => {
       <CRow>
         <CCol lg={9}>
           <CRow>
+            <DayDetailModal
+              handleSetDayDetailVisible={handleSetDayDetailVisible}
+              dayDetailModalVisible={dayDetailModalVisible}
+              dayDetailSelect={dayDetailSelect}
+              rangeDayDetailSelect={rangeDayDetailSelect}
+            ></DayDetailModal>
             <CCol xs={8}>
               <Bar
-                options={options}
+                options={{
+                  ...options,
+                  onClick: async (event, elementosActivos) => {
+                    if (elementosActivos.length > 0) {
+                      const fetchMachineUtilizationsDetail = async (
+                        machineSelected,
+                        daySelectStart,
+                        daySelectEnd,
+                        detailed,
+                      ) => {
+                        let response = await GetMachineUtilizations(
+                          machineSelected,
+                          daySelectStart,
+                          daySelectEnd,
+                          null,
+                          detailed,
+                        )
+
+                        if (response == 'fail') {
+                          navigate('/Login', { replace: true })
+                        } else {
+                          return response
+                        }
+                      }
+                      const elementoClickeado = elementosActivos[0]
+                      const clickInfo = machineUtilizations[elementoClickeado.index]
+                      const machineDetail = clickInfo.machine
+
+                      const daySelect = moment(clickInfo.date).format('MM-DD-YYYY')
+
+                      const dateFiveDaysAgo = moment(clickInfo.date)
+                        .subtract(5, 'days')
+                        .format('MM-DD-YYYY')
+
+                      let infoDetailDay = await fetchMachineUtilizationsDetail(
+                        machineDetail,
+                        daySelect,
+                        daySelect,
+                        true,
+                      )
+                      let infoRangeDetailDay = await fetchMachineUtilizationsDetail(
+                        machineDetail,
+                        dateFiveDaysAgo,
+                        daySelect,
+
+                        false,
+                      )
+                      setDayDetailSelect(infoDetailDay)
+                      setRangeDayDetailSelect(infoRangeDetailDay)
+                      handleSetDayDetailVisible(true)
+                    }
+                  },
+                }}
                 data={{
                   labels: machineUtilizations.map((machine) =>
                     moment(machine.date).format('MM-DD-YYYY'),
