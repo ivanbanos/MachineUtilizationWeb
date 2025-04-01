@@ -39,7 +39,8 @@ const WatchCameraModal = (props) => {
     password,
   )
 
-  console.log(cameraUrl) // Imprime la URL dinámica resultante
+  // console.log(cameraUrl)
+  // Imprime la URL dinámica resultante
 
   return (
     <>
