@@ -58,13 +58,13 @@ const WatchCameraModal = (props) => {
           <CRow>
             <div className="embed-responsive embed-responsive-16by9 d-flex justify-content-center">
               <iframe
-                className="embed-responsive-item"
                 width="560"
                 height="315"
                 src={cameraUrl}
                 title="Machine Utilization"
                 frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
                 allowfullscreen
               ></iframe>
             </div>
