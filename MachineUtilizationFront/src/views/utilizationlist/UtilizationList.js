@@ -62,6 +62,8 @@ const UtilizationList = () => {
       machineId,
       moment(strat).format('MM-DD-YYYY'),
       moment(end).format('MM-DD-YYYY'),
+      null,
+      false,
     )
     if (response == 'fail') {
       navigate('/Login', { replace: true })
