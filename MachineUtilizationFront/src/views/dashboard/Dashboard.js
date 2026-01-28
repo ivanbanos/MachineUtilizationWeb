@@ -24,10 +24,14 @@ const Dashboard = () => {
     <>
       <CRow>
         {[...machines]
-          .sort((a, b) => a.name.localeCompare(b.name))
+          .sort((a, b) => a.clientName.localeCompare(b.clientName))
           .map((machine) => (
-            <CCol key={machine.guid} xs={12} sm={6} md={4} style={{ minHeight: '200px' }}>
-              <MachinesDropdown name={machine.name} guid={machine.guid} />
+            <CCol key={machine.guid} xs={12} sm={6} lg={4} xl={3}>
+              <MachinesDropdown
+                name={machine.name}
+                guid={machine.guid}
+                clientName={machine.clientName}
+              />
             </CCol>
           ))}
       </CRow>
