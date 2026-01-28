@@ -58,7 +58,14 @@ const DayDetailModal = ({
     },
   }
 
-  const dayDetailSelectAcotado = dayDetailSelect.slice(12, dayDetailSelect.length - 11)
+  const dayDetailSelectAcotado = dayDetailSelect.filter((item) => {
+    const d = new Date(item.date)
+    const minutes = d.getHours() * 60 + d.getMinutes()
+    const start = 6 * 60
+    const end = 18 * 60
+
+    return minutes >= start && minutes <= end
+  })
 
   return (
     <>

@@ -13,14 +13,29 @@ import { cilOptions, cilCalculator } from '@coreui/icons'
 
 const MachinesDropdown = (props) => {
   return (
-    <CCol sm={6} lg={3}>
+    <CCol>
       <CWidgetStatsA
         className="mb-4"
         color="primary"
+        style={{
+          height: '150px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
         value={
           <>
             <CIcon icon={cilCalculator} className="text-high-emphasis-inverse" />
-            <label>{props.name}</label>
+            <label
+              style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
+              }}
+            >
+              {props.name}
+            </label>
           </>
         }
         title={props.guid}
