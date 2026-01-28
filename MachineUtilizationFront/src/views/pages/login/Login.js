@@ -97,6 +97,7 @@ const Login = () => {
                           onClick={handleSubmit}
                           navigate={navigate}
                           seterrormessages={seterrormessages}
+                          type="submit"
                         >
                           Login
                         </CButton>

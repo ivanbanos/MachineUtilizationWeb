@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from 'react'
 import MachinesDropdown from '../machines/MachinesDropdown'
 import GetMachines from '../../services/GetMachines'
-import { CRow } from '@coreui/react'
+import { CRow, CCol } from '@coreui/react'
 import { Link, useNavigate } from 'react-router-dom'
 
 const Dashboard = () => {
@@ -20,13 +20,20 @@ const Dashboard = () => {
   useEffect(() => {
     fetchMachines()
   }, [])
-
   return (
     <>
       <CRow>
-        {machines.map((machine) => (
-          <MachinesDropdown key={machine.guid} name={machine.name} guid={machine.guid} />
-        ))}
+        {[...machines]
+          .sort((a, b) => a.clientName.localeCompare(b.clientName))
+          .map((machine) => (
+            <CCol key={machine.guid} xs={12} sm={6} lg={4} xl={3}>
+              <MachinesDropdown
+                name={machine.name}
+                guid={machine.guid}
+                clientName={machine.clientName}
+              />
+            </CCol>
+          ))}
       </CRow>
     </>
   )
