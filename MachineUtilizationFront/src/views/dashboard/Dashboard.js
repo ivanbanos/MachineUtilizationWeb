@@ -24,7 +24,7 @@ const Dashboard = () => {
     <>
       <CRow>
         {[...machines]
-          .sort((a, b) => a.clientName.localeCompare(b.clientName))
+          .sort((a, b) => (a.clientName || '').localeCompare(b.clientName || ''))
           .map((machine) => (
             <CCol key={machine.guid} xs={12} sm={6} lg={4} xl={3}>
               <MachinesDropdown
