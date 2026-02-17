@@ -40,7 +40,7 @@ const SeeShiftDetail = (props) => {
         style={{ margin: '2pt' }}
         onClick={() => navigate('/MachineShiftDetail/' + props.machineUtilizationId)}
       >
-        <CIcon icon={cilMagnifyingGlass} size="m" />
+        <CIcon icon={cilMagnifyingGlass} size="sm" />
       </CButton>
     </>
   )

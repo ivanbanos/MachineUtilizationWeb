@@ -42,7 +42,7 @@ const AddMachineModal = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setAddMachineVisible(true)}>
-        <CIcon icon={cilPlus} size="m" />
+        <CIcon icon={cilPlus} size="sm" />
       </CButton>
       <CModal visible={addMachineVisible} onClose={() => setAddMachineVisible(false)}>
         <CModalHeader>
@@ -93,7 +93,7 @@ const TaskMachine = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setUpdateMachineVisible(true)}>
-        <CIcon icon={cilPencil} size="m" />
+        <CIcon icon={cilPencil} size="sm" />
       </CButton>
       <CModal visible={updateMachineVisible} onClose={() => setUpdateMachineVisible(false)}>
         <CModalHeader>
@@ -117,7 +117,7 @@ const TaskMachine = (props) => {
         </CModalFooter>
       </CModal>
       <CButton style={{ margin: '2pt' }} onClick={() => setDeleteMachineVisible(true)}>
-        <CIcon icon={cilX} size="m" />
+        <CIcon icon={cilX} size="sm" />
       </CButton>
       <CModal visible={deleteMachineVisible} onClose={() => setDeleteMachineVisible(false)}>
         <CModalHeader>

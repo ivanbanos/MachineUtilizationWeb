@@ -90,11 +90,11 @@ const MachinesDropdown = (props) => {
                   <CIcon icon={cilOptions} className="text-high-emphasis-inverse" />
                 </CDropdownToggle>
                 <CDropdownMenu>
-                  <CDropdownItem>
-                    <Link to={'/summary/' + props.guid}>Utilization Summary</Link>
+                  <CDropdownItem component={Link} to={'/summary/' + props.guid}>
+                    Utilization Summary
                   </CDropdownItem>
-                  <CDropdownItem>
-                    <Link to={'/MachineUtilizations/' + props.guid}>Utilization list</Link>
+                  <CDropdownItem component={Link} to={'/MachineUtilizations/' + props.guid}>
+                    Utilization list
                   </CDropdownItem>
                 </CDropdownMenu>
               </CDropdown>

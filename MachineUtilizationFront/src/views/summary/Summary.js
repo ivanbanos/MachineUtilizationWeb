@@ -72,6 +72,7 @@ const Summary = () => {
   const [machineUtilizations, setMachineUtilizations] = useState([])
   const [productionTimeAverage, setProductionTimeAverage] = useState(0)
   const [powerOnAverage, setPowerOnAverage] = useState(0)
+  const [pieceCountAverage, setPieceCountAverage] = useState(0)
   const [machine, setMachine] = useState({ name: '' })
   const [operator, setOperator] = useState('00000000-0000-0000-0000-000000000000')
   const [operators, setOperators] = useState([])
@@ -103,17 +104,25 @@ const Summary = () => {
     if (response == 'fail') {
       navigate('/Login', { replace: true })
     } else {
-      // console.log(machineUtilizations.map((machine) => machine.date))
       setMachineUtilizations(response)
+      const count = response.length
       setProductionTimeAverage(
-        response.reduce((sum, machine) => sum + Number(machine.productionTime), 0) /
-          response.length,
+        count
+          ? response.reduce((sum, machine) => sum + Number(machine.productionTime), 0) / count
+          : 0,
       )
       setPowerOnAverage(
-        response.reduce(
-          (sum, machine) => sum + Number(machine.idleTime + machine.productionTime),
-          0,
-        ) / response.length,
+        count
+          ? response.reduce(
+              (sum, machine) => sum + Number(machine.idleTime + machine.productionTime),
+              0,
+            ) / count
+          : 0,
+      )
+      setPieceCountAverage(
+        count
+          ? response.reduce((sum, machine) => sum + Number(machine.pieceCount || 0), 0) / count
+          : 0,
       )
     }
     await getListOperators(machines.filter((element) => element.guid >= machineId)[0])
@@ -126,7 +135,6 @@ const Summary = () => {
   const handleOperatorChange = (event) => {
     setOperator(event.target.value)
   }
-
   return (
     <>
       <h1>Machine Utilization Summary</h1>
@@ -137,7 +145,7 @@ const Summary = () => {
           <CCard>
             <CCardHeader>Filters</CCardHeader>
             <CCardBody>
-              <CCardText>
+              <CCardText component="div">
                 <CRow>
                   <CCol style={{ margin: '2pt' }} xs={2}>
                     Start date
@@ -186,114 +194,170 @@ const Summary = () => {
               dayDetailSelect={dayDetailSelect}
               rangeDayDetailSelect={rangeDayDetailSelect}
             ></DayDetailModal>
-            <CCol xs={8}>
-              <Bar
-                options={{
-                  ...options,
-                  onClick: async (event, elementosActivos) => {
-                    if (elementosActivos.length > 0) {
-                      const fetchMachineUtilizationsDetail = async (
-                        machineSelected,
-                        daySelectStart,
-                        daySelectEnd,
-                        detailed,
-                      ) => {
-                        let response = await GetMachineUtilizations(
+            <CRow className="align-items-center mb-3">
+              <CCol xs={8}>
+                <Bar
+                  options={{
+                    ...options,
+                    tooltip: {
+                      callbacks: {
+                        label: (context) => {
+                          let label = context.dataset.label || ''
+                          if (label) label += ': '
+                          if (context.parsed.y !== null) label += context.parsed.y
+                          return label
+                        },
+                        afterBody: (tooltipItems) => {
+                          const dataIndex = tooltipItems[0]?.dataIndex
+                          if (dataIndex !== undefined && machineUtilizations[dataIndex]) {
+                            const item = machineUtilizations[dataIndex]
+                            const pieceCount = Math.floor(item.pieceCount ?? item.piece_count ?? 0)
+                            return `Piece count: ${pieceCount}`
+                          }
+                          return ''
+                        },
+                      },
+                    },
+                    onClick: async (event, elementosActivos) => {
+                      if (elementosActivos.length > 0) {
+                        const fetchMachineUtilizationsDetail = async (
                           machineSelected,
                           daySelectStart,
                           daySelectEnd,
-                          null,
                           detailed,
-                        )
+                        ) => {
+                          let response = await GetMachineUtilizations(
+                            machineSelected,
+                            daySelectStart,
+                            daySelectEnd,
+                            null,
+                            detailed,
+                          )
 
-                        if (response == 'fail') {
-                          navigate('/Login', { replace: true })
-                        } else {
-                          return response
+                          if (response == 'fail') {
+                            navigate('/Login', { replace: true })
+                          } else {
+                            return response
+                          }
                         }
+                        const elementoClickeado = elementosActivos[0]
+                        const clickInfo = machineUtilizations[elementoClickeado.index]
+                        const machineDetail = clickInfo.machine
+
+                        const daySelect = moment(clickInfo.date).format('MM-DD-YYYY')
+
+                        const dateFiveDaysAgo = moment(clickInfo.date)
+                          .subtract(5, 'days')
+                          .format('MM-DD-YYYY')
+
+                        let infoDetailDay = await fetchMachineUtilizationsDetail(
+                          machineDetail,
+                          daySelect,
+                          daySelect,
+                          true,
+                        )
+                        let infoRangeDetailDay = await fetchMachineUtilizationsDetail(
+                          machineDetail,
+                          dateFiveDaysAgo,
+                          daySelect,
+
+                          false,
+                        )
+                        setDayDetailSelect(infoDetailDay)
+                        setRangeDayDetailSelect(infoRangeDetailDay)
+                        handleSetDayDetailVisible(true)
                       }
-                      const elementoClickeado = elementosActivos[0]
-                      const clickInfo = machineUtilizations[elementoClickeado.index]
-                      const machineDetail = clickInfo.machine
-
-                      const daySelect = moment(clickInfo.date).format('MM-DD-YYYY')
-
-                      const dateFiveDaysAgo = moment(clickInfo.date)
-                        .subtract(5, 'days')
-                        .format('MM-DD-YYYY')
-
-                      let infoDetailDay = await fetchMachineUtilizationsDetail(
-                        machineDetail,
-                        daySelect,
-                        daySelect,
-                        true,
-                      )
-                      let infoRangeDetailDay = await fetchMachineUtilizationsDetail(
-                        machineDetail,
-                        dateFiveDaysAgo,
-                        daySelect,
-
-                        false,
-                      )
-                      setDayDetailSelect(infoDetailDay)
-                      setRangeDayDetailSelect(infoRangeDetailDay)
-                      handleSetDayDetailVisible(true)
-                    }
-                  },
-                }}
-                data={{
-                  labels: machineUtilizations.map((machine) =>
-                    moment(machine.date).format('MM-DD-YYYY'),
-                  ),
-                  datasets: [
-                    {
-                      label: 'Production time',
-                      backgroundColor: '#05A51B',
-                      data: machineUtilizations.map((machine) => machine.productionTime),
                     },
-                    {
-                      label: 'Idle time',
-                      backgroundColor: '#EA0F0F',
-                      data: machineUtilizations.map((machine) => machine.idleTime),
+                  }}
+                  data={{
+                    labels: machineUtilizations.map((machine) =>
+                      moment(machine.date).format('MM-DD-YYYY'),
+                    ),
+                    datasets: [
+                      {
+                        label: 'Production time',
+                        backgroundColor: '#05A51B',
+                        data: machineUtilizations.map((machine) => machine.productionTime),
+                      },
+                      {
+                        label: 'Idle time',
+                        backgroundColor: '#EA0F0F',
+                        data: machineUtilizations.map((machine) => machine.idleTime),
+                      },
+                    ],
+                  }}
+                  labels="days"
+                />
+              </CCol>
+              <CCol lg={3}>
+                <AverageReport average={productionTimeAverage.toFixed(2)} color={'#05A51B'} />
+              </CCol>
+            </CRow>
+            <CRow className="align-items-center mb-3">
+              <CCol xs={8}>
+                <Bar
+                  options={options}
+                  data={{
+                    labels: machineUtilizations.map((machine) =>
+                      moment(machine.date).format('MM-DD-YYYY'),
+                    ),
+                    datasets: [
+                      {
+                        label: 'Power ON',
+                        backgroundColor: '#052CA5',
+                        data: machineUtilizations.map((machine) => {
+                          return machine.idleTime + machine.productionTime
+                        }),
+                      },
+                      {
+                        label: 'Power OFF',
+                        backgroundColor: '#8B8B8B',
+                        data: machineUtilizations.map((machine) => {
+                          return 24 - machine.idleTime - machine.productionTime
+                        }),
+                      },
+                    ],
+                  }}
+                  labels="days"
+                />
+              </CCol>
+              <CCol lg={3}>
+                <AverageReport average={powerOnAverage.toFixed(2)} color={'#052CA5'} />
+              </CCol>
+            </CRow>
+            <CRow className="align-items-center mb-3">
+              <CCol xs={8}>
+                <Bar
+                  options={{
+                    scales: {
+                      x: { stacked: false },
+                      y: {
+                        stacked: false,
+                        ticks: { stepSize: 1 },
+                      },
                     },
-                  ],
-                }}
-                labels="days"
-              />
-            </CCol>
-            <CCol lg={3}>
-              <AverageReport average={productionTimeAverage.toFixed(2)} color={'#05A51B'} />
-            </CCol>
-            <CCol xs={8}>
-              <Bar
-                options={options}
-                data={{
-                  labels: machineUtilizations.map((machine) =>
-                    moment(machine.date).format('MM-DD-YYYY'),
-                  ),
-                  datasets: [
-                    {
-                      label: 'Power ON',
-                      backgroundColor: '#052CA5',
-                      data: machineUtilizations.map((machine) => {
-                        return machine.idleTime + machine.productionTime
-                      }),
-                    },
-                    {
-                      label: 'Power OFF',
-                      backgroundColor: '#8B8B8B',
-                      data: machineUtilizations.map((machine) => {
-                        return 24 - machine.idleTime - machine.productionTime
-                      }),
-                    },
-                  ],
-                }}
-                labels="days"
-              />
-            </CCol>
-            <CCol lg={3}>
-              <AverageReport average={powerOnAverage.toFixed(2)} color={'#052CA5'} />
-            </CCol>
+                  }}
+                  data={{
+                    labels: machineUtilizations.map((machine) =>
+                      moment(machine.date).format('MM-DD-YYYY'),
+                    ),
+                    datasets: [
+                      {
+                        label: 'Piece Count',
+                        backgroundColor: '#2d6bb8',
+                        data: machineUtilizations.map((machine) =>
+                          Math.floor(machine.pieceCount || 0),
+                        ),
+                      },
+                    ],
+                  }}
+                  labels="days"
+                />
+              </CCol>
+              <CCol lg={3}>
+                <AverageReport average={pieceCountAverage.toFixed(2)} color={'#2d6bb8'} />
+              </CCol>
+            </CRow>
           </CRow>
         </CCol>
         <CCol lg={3}>

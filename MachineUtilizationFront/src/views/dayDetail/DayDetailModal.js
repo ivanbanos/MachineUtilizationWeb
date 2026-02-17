@@ -107,6 +107,34 @@ const DayDetailModal = ({
             />
           </CCol>
 
+          <CCol xs={11} className="mt-3">
+            <h4>Piece Count Detail</h4>
+            <Bar
+              options={{
+                scales: {
+                  x: { stacked: false },
+                  y: {
+                    stacked: false,
+                    ticks: { stepSize: 1 },
+                  },
+                },
+              }}
+              data={{
+                labels: dayDetailSelectAcotado.map((period) => moment(period.date).format('HH:mm')),
+                datasets: [
+                  {
+                    label: 'Piece Count',
+                    backgroundColor: '#2d6bb8',
+                    data: dayDetailSelectAcotado.map((period) =>
+                      Math.floor(period.pieceCount ?? period.piece_count ?? 0),
+                    ),
+                  },
+                ],
+              }}
+              labels="half hour"
+            />
+          </CCol>
+
           <CCol xs={10} className="mt-3">
             {dayDetailSelect.length > 0 && (
               <>

@@ -42,7 +42,7 @@ const AddClientModal = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setAddClientVisible(true)}>
-        <CIcon icon={cilPlus} size="m" />
+        <CIcon icon={cilPlus} size="sm" />
       </CButton>
       <CModal visible={addClientVisible} onClose={() => setAddClientVisible(false)}>
         <CModalHeader>
@@ -98,7 +98,7 @@ const TaskClient = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setUpdateClientVisible(true)}>
-        <CIcon icon={cilPencil} size="m" />
+        <CIcon icon={cilPencil} size="sm" />
       </CButton>
       <CModal visible={updateClientVisible} onClose={() => setUpdateClientVisible(false)}>
         <CModalHeader>
@@ -122,7 +122,7 @@ const TaskClient = (props) => {
         </CModalFooter>
       </CModal>
       <CButton style={{ margin: '2pt' }} onClick={() => setDeleteClientVisible(true)}>
-        <CIcon icon={cilX} size="m" />
+        <CIcon icon={cilX} size="sm" />
       </CButton>
       <CModal visible={deleteClientVisible} onClose={() => setDeleteClientVisible(false)}>
         <CModalHeader>

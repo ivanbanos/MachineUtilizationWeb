@@ -108,7 +108,7 @@ const AddUserModal = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setAddUserVisible(true)}>
-        <CIcon icon={cilPlus} size="m" />
+        <CIcon icon={cilPlus} size="sm" />
       </CButton>
       <CModal visible={addUserVisible} onClose={() => setAddUserVisible(false)}>
         <CModalHeader>
@@ -246,7 +246,7 @@ const TaskUser = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setUpdateUserVisible(true)}>
-        <CIcon icon={cilPencil} size="m" />
+        <CIcon icon={cilPencil} size="sm" />
       </CButton>
       <CModal visible={updateUserVisible} onClose={() => setUpdateUserVisible(false)}>
         <CModalHeader>
@@ -307,7 +307,7 @@ const TaskUser = (props) => {
         </CModalFooter>
       </CModal>
       <CButton style={{ margin: '2pt' }} onClick={() => setDeleteUserVisible(true)}>
-        <CIcon icon={cilX} size="m" />
+        <CIcon icon={cilX} size="sm" />
       </CButton>
       <CModal visible={deleteUserVisible} onClose={() => setDeleteUserVisible(false)}>
         <CModalHeader>
