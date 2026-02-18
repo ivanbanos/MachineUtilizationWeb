@@ -45,7 +45,7 @@ const WatchCameraModal = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setWatchCameraVisible(true)}>
-        <CIcon icon={cilTv} size="m" />
+        <CIcon icon={cilTv} size="sm" />
       </CButton>
       <CModal
         className="modal-lg"
@@ -106,8 +106,12 @@ const TaskCamera = (props) => {
     <>
       <CTableHeaderCell>
         <CButton style={{ margin: '2pt' }} onClick={() => setUpdateCameraVisible(true)}>
-          <CIcon icon={cilPencil} size="m" />
+          <CIcon icon={cilPencil} size="sm" />
         </CButton>
+        <CButton style={{ margin: '2pt' }} onClick={() => setDeleteCameraVisible(true)}>
+          <CIcon icon={cilX} size="sm" />
+        </CButton>
+        <WatchCameraModal camera={props.camera} />
       </CTableHeaderCell>
       <CModal visible={updateCameraVisible} onClose={() => setUpdateCameraVisible(false)}>
         <CModalHeader>
@@ -130,11 +134,6 @@ const TaskCamera = (props) => {
           </CButton>
         </CModalFooter>
       </CModal>
-      <CTableHeaderCell>
-        <CButton style={{ margin: '2pt' }} onClick={() => setDeleteCameraVisible(true)}>
-          <CIcon icon={cilX} size="m" />
-        </CButton>
-      </CTableHeaderCell>
       <CModal visible={deleteCameraVisible} onClose={() => setDeleteCameraVisible(false)}>
         <CModalHeader>
           <CModalTitle>Delete Camera</CModalTitle>
@@ -153,9 +152,6 @@ const TaskCamera = (props) => {
           </CButton>
         </CModalFooter>
       </CModal>
-      <CTableHeaderCell>
-        <WatchCameraModal camera={props.camera} />
-      </CTableHeaderCell>
     </>
   )
 }
@@ -186,7 +182,7 @@ const AddCameraModal = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setAddCameraVisible(true)}>
-        <CIcon icon={cilPlus} size="m" />
+        <CIcon icon={cilPlus} size="sm" />
       </CButton>
       <CModal visible={addCameraVisible} onClose={() => setAddCameraVisible(false)}>
         <CModalHeader>
@@ -265,14 +261,12 @@ const Cameras = (props) => {
               cameras.map((camera) => (
                 <CTableRow key={camera.guid}>
                   <CTableHeaderCell>{camera.name}</CTableHeaderCell>
-                  <CTableHeaderCell>
-                    <TaskCamera
-                      GetCameras={fetchCameras}
-                      toast={toastRef}
-                      camera={camera}
-                      machineId={props.machineId}
-                    ></TaskCamera>
-                  </CTableHeaderCell>
+                  <TaskCamera
+                    GetCameras={fetchCameras}
+                    toast={toastRef}
+                    camera={camera}
+                    machineId={props.machineId}
+                  />
                 </CTableRow>
               ))}
             <CTableRow></CTableRow>

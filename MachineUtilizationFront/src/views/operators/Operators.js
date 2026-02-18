@@ -43,7 +43,7 @@ const AddOperatorModal = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setAddOperatorVisible(true)}>
-        <CIcon icon={cilPlus} size="m" />
+        <CIcon icon={cilPlus} size="sm" />
       </CButton>
       <CModal visible={addOperatorVisible} onClose={() => setAddOperatorVisible(false)}>
         <CModalHeader>
@@ -94,7 +94,7 @@ const TaskOperator = (props) => {
   return (
     <>
       <CButton style={{ margin: '2pt' }} onClick={() => setUpdateOperatorVisible(true)}>
-        <CIcon icon={cilPencil} size="m" />
+        <CIcon icon={cilPencil} size="sm" />
       </CButton>
       <CModal visible={updateOperatorVisible} onClose={() => setUpdateOperatorVisible(false)}>
         <CModalHeader>
@@ -118,7 +118,7 @@ const TaskOperator = (props) => {
         </CModalFooter>
       </CModal>
       <CButton style={{ margin: '2pt' }} onClick={() => setDeleteOperatorVisible(true)}>
-        <CIcon icon={cilX} size="m" />
+        <CIcon icon={cilX} size="sm" />
       </CButton>
       <CModal visible={deleteOperatorVisible} onClose={() => setDeleteOperatorVisible(false)}>
         <CModalHeader>
