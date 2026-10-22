@@ -25,7 +25,13 @@ import {
 } from '@coreui/react'
 
 import Toast from '../toast/Toast'
+import { getSessionRole, hasRole, isReadOnly } from '../../utils/roles'
 
+/**
+ * Botón y modal para dar de alta una máquina.
+ * @param {object} props GetMachines para recargar y toast para avisar.
+ * @returns {JSX.Element} Botón de alta con su modal.
+ */
 const AddMachineModal = (props) => {
   const [addMachineVisible, setAddMachineVisible] = useState(false)
   const [newMachineName, setNewMachineName] = useState()
@@ -69,6 +75,11 @@ const AddMachineModal = (props) => {
   )
 }
 
+/**
+ * Botones y modales para editar y borrar una máquina.
+ * @param {object} props Machine, GetMachines para recargar y toast para avisar.
+ * @returns {JSX.Element} Acciones de edición y borrado.
+ */
 const TaskMachine = (props) => {
   let navigate = useNavigate()
   const [updateMachineVisible, setUpdateMachineVisible] = useState(false)
@@ -141,14 +152,18 @@ const TaskMachine = (props) => {
   )
 }
 
+/**
+ * Lista de máquinas; redirige a /Login si el rol no tiene acceso.
+ * @returns {JSX.Element} Tabla de máquinas con controles de escritura según el rol.
+ */
 const MachinesList = () => {
   let navigate = useNavigate()
   const [Machines, setMachines] = useState([])
   const toastRef = useRef()
+  const readOnly = isReadOnly(getSessionRole())
 
   const fetchMachines = async () => {
-    let role = localStorage.getItem('role')
-    if (role > 2) {
+    if (!hasRole(getSessionRole(), [1, 2, 4])) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
@@ -166,7 +181,7 @@ const MachinesList = () => {
     <>
       <Toast ref={toastRef}></Toast>
       <h1>Machines</h1>
-      <AddMachineModal GetMachines={fetchMachines} toast={toastRef} />
+      {!readOnly && <AddMachineModal GetMachines={fetchMachines} toast={toastRef} />}
       <CRow>
         <CTable>
           <CTableHead>
@@ -180,7 +195,9 @@ const MachinesList = () => {
               <CTableRow key={Machine.guid}>
                 <CTableHeaderCell>{Machine.name}</CTableHeaderCell>
                 <CTableHeaderCell>
-                  <TaskMachine GetMachines={fetchMachines} toast={toastRef} Machine={Machine} />
+                  {!readOnly && (
+                    <TaskMachine GetMachines={fetchMachines} toast={toastRef} Machine={Machine} />
+                  )}
                 </CTableHeaderCell>
               </CTableRow>
             ))}

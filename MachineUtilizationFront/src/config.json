@@ -1,4 +1,4 @@
 {
-  "SERVER_URL": "https://machineutilization.dbhaffnerna3.com",
+  "SERVER_URL": "https://localhost:7116",
   "CAMERA_URL": "https://alexxit.github.io/go2rtc/#share=%USER_NAME%&pwd=%PASSWORD%&media=video+audio"
 }

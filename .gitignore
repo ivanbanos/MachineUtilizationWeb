@@ -348,3 +348,13 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Planes de dotnet-orchestrator (no se versionan)
+/.feature-dev/planes/
+/graphify-out
+/MachineUtilizationFront/graphify-out/
+/CLAUDE.md
+/MachineUtilizationFront/.graphifyignore
+/.claude
+/docs
+MachineUtilizationFront/.react-clean-code/

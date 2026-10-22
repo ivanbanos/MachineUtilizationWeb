@@ -28,26 +28,101 @@ import {
 } from '@coreui/react'
 
 import Toast from '../toast/Toast'
+import { ROLES, ROLE_NAMES, getSessionRole, hasRole } from '../../utils/roles'
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const EMPTY_GUID = '00000000-0000-0000-0000-000000000000'
+
+const USER_ERROR_MESSAGES = {
+  invalidEmail: 'Invalid email',
+  clientRequired: 'Select a client',
+  passwordRequired: 'Enter a password',
+  userNotFound: 'User not found',
+  emailUsed: 'Email already in use',
+  usernameUsed: 'Username already in use',
+  limit: 'Supervisor limit reached for this client (max. 5)',
+  machineLimit: 'This client already has a machine user',
+  roleNotAllowed: 'You are not allowed to assign this role',
+  readOnly: 'Your role is read-only',
+}
+
+const CLIENT_ROLES = [ROLES.SUPERVISOR, ROLES.OPERATOR, ROLES.MACHINE]
+
+/**
+ * Lista los roles que puede asignar quien tiene la sesión.
+ * @param {number} sessionRole Rol de la sesión.
+ * @returns {{value: number, name: string}[]} Roles asignables; vacía si no puede asignar ninguno.
+ */
+const getAssignableRoles = (sessionRole) => {
+  let values = []
+  if (sessionRole === ROLES.SUPER_ADMINISTRATOR) {
+    values = [
+      ROLES.SUPER_ADMINISTRATOR,
+      ROLES.ADMINISTRATOR,
+      ROLES.SUPERVISOR,
+      ROLES.OPERATOR,
+      ROLES.MACHINE,
+    ]
+  } else if (sessionRole === ROLES.SUPERVISOR) {
+    values = [ROLES.SUPERVISOR, ROLES.OPERATOR]
+  }
+  return values.map((value) => ({ value, name: ROLE_NAMES[value] }))
+}
+
+/**
+ * Indica si un rol exige cliente.
+ * @param {number|string} role Rol a evaluar.
+ * @returns {boolean} True para Supervisor, Operator y Machine.
+ */
+const roleNeedsClient = (role) => CLIENT_ROLES.includes(Number(role))
+
+/**
+ * Indica si falta elegir un cliente.
+ * @param {string} client Id del cliente elegido.
+ * @returns {boolean} True si está vacío o es el id nulo.
+ */
+const isClientMissing = (client) =>
+  !client || client === EMPTY_GUID || client === 'undefined' || client === 'null'
+
+/**
+ * Valida los datos comunes del formulario de usuario.
+ * @param {number|string} role Rol elegido.
+ * @param {string} client Id del cliente elegido.
+ * @param {string} email Correo escrito.
+ * @returns {string|null} Mensaje del primer problema, o null si todo es válido.
+ */
+const validateUserForm = (role, client, email) => {
+  if (roleNeedsClient(role) && isClientMissing(client)) {
+    return USER_ERROR_MESSAGES.clientRequired
+  }
+  const emailOptional = Number(role) === ROLES.MACHINE
+  if ((email || !emailOptional) && !EMAIL_PATTERN.test(email)) {
+    return USER_ERROR_MESSAGES.invalidEmail
+  }
+  return null
+}
+
+/**
+ * Botón y modal para crear un usuario; el correo es obligatorio salvo para Machine.
+ * @param {object} props.GetUsers Función que recarga la lista tras crear.
+ * @param {object} props.toast Ref del Toast donde se muestran los avisos.
+ * @returns {JSX.Element} El botón de alta y su modal.
+ */
 const AddUserModal = (props) => {
   let navigate = useNavigate()
-  let role = localStorage.getItem('role')
   let idClient = localStorage.getItem('idClient')
   const [addUserVisible, setAddUserVisible] = useState(false)
   const [newUserName, setNewUserName] = useState()
   const [newPassword, setNewPassword] = useState()
   const [newRole, setNewRole] = useState()
-  const [clientDisabled, setclientDisabled] = useState(role == 1)
+  const [clientDisabled, setclientDisabled] = useState(true)
   const [operatorDisabled, setoperatorDisabled] = useState(true)
   const [client, setClient] = useState(idClient)
   const [clients, setClients] = useState([])
   const [name, setName] = useState('')
-  let roles = []
-  if (role == 1) {
-    roles.push({ value: 1, name: 'Administrator' })
-  }
-  roles.push({ value: 2, name: 'Supervisor' })
-  roles.push({ value: 3, name: 'Operator' })
+  const [newEmail, setNewEmail] = useState('')
+  const roles = getAssignableRoles(getSessionRole())
   const handleUserNameChange = (event) => {
     setNewUserName(event.target.value)
   }
@@ -55,31 +130,37 @@ const AddUserModal = (props) => {
     setNewPassword(event.target.value)
   }
   const handleClientChange = (event) => {
-    console.log(event.target.value)
     setClient(event.target.value)
+  }
+  const handleEmailChange = (event) => {
+    setNewEmail(event.target.value)
   }
   const handleNameChange = (event) => {
     setName(event.target.value)
   }
   const handleRoleChange = (event) => {
     setNewRole(event.target.value)
-    if (event.target.value == 1) {
-      setclientDisabled(true)
-      setoperatorDisabled(true)
-    }
-    if (event.target.value == 2) {
-      setclientDisabled(false)
-      setoperatorDisabled(true)
-    }
-    if (event.target.value == 3) {
-      setclientDisabled(false)
-      setoperatorDisabled(false)
-    }
+    setclientDisabled(!roleNeedsClient(event.target.value))
+    setoperatorDisabled(Number(event.target.value) !== ROLES.OPERATOR)
   }
   const addUser = async () => {
-    console.log(client)
-    let user = await AddUser(newUserName, newPassword, newRole, client)
-    if (newRole == 3) {
+    const problem = validateUserForm(newRole, client, newEmail)
+    if (problem) {
+      props.toast.current.showToast(problem)
+      return
+    }
+    let user = await AddUser(
+      newUserName,
+      newPassword,
+      newRole,
+      roleNeedsClient(newRole) ? client : undefined,
+      newEmail,
+    )
+    if (typeof user === 'string') {
+      props.toast.current.showToast(USER_ERROR_MESSAGES[user] ?? 'Could not create the user')
+      return
+    }
+    if (Number(newRole) === ROLES.OPERATOR) {
       await AddOperator(name, client, user.guid)
     }
     props.GetUsers()
@@ -88,15 +169,12 @@ const AddUserModal = (props) => {
   }
 
   const fetchClients = async () => {
-    let role = localStorage.getItem('role')
-    console.log(role)
-    if (role > 2) {
+    if (!hasRole(getSessionRole(), [1, 2, 4])) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
     } else {
       let clients = await GetClients()
-      console.log(clients)
       setClients(clients)
     }
   }
@@ -124,6 +202,10 @@ const AddUserModal = (props) => {
             <CCol xs={10}>
               <CFormInput type="password" placeholder="Password" onChange={handlePasswordChange} />
             </CCol>
+            <CCol xs={2}>Email</CCol>
+            <CCol xs={10}>
+              <CFormInput type="email" placeholder="Email" onChange={handleEmailChange} />
+            </CCol>
             <CCol xs={2}>Role</CCol>
             <CCol xs={10}>
               <CFormSelect aria-label="Default select example" onChange={handleRoleChange}>
@@ -143,7 +225,7 @@ const AddUserModal = (props) => {
                 onChange={handleClientChange}
                 disabled={clientDisabled}
               >
-                <option value={'00000000-0000-0000-0000-000000000000'}>Select One</option>
+                <option value={EMPTY_GUID}>Select One</option>
                 {clients.map((client) => (
                   <option key={client.guid} value={client.guid}>
                     {client.name}
@@ -174,24 +256,24 @@ const AddUserModal = (props) => {
   )
 }
 
+/**
+ * Botones y modales para editar o borrar un usuario; el correo es obligatorio salvo para Machine.
+ * @param {object} props.User Usuario de la fila.
+ * @param {Function} props.GetUsers Función que recarga la lista tras guardar.
+ * @param {object} props.toast Ref del Toast donde se muestran los avisos.
+ * @returns {JSX.Element} Los botones de edición y borrado con sus modales.
+ */
 const TaskUser = (props) => {
   let navigate = useNavigate()
   const [updateUserVisible, setUpdateUserVisible] = useState(false)
   const [newUserName, setNewUserName] = useState(props.User.username)
   const [deleteUserVisible, setDeleteUserVisible] = useState(false)
-  let role = localStorage.getItem('role')
-  let idClient = localStorage.getItem('idClient')
   const [newPassword, setNewPassword] = useState()
+  const [newEmail, setNewEmail] = useState(props.User.email ?? '')
   const [newRole, setNewRole] = useState(props.User.idRole)
   const [client, setClient] = useState(props.User.idClient)
   const [clients, setClients] = useState([])
-  console.log(props.User)
-  let roles = []
-  if (role == 1) {
-    roles.push({ value: 1, name: 'Administrator' })
-  }
-  roles.push({ value: 2, name: 'Supervisor' })
-  roles.push({ value: 3, name: 'Operator' })
+  const roles = getAssignableRoles(getSessionRole())
   const handleUserNameChange = (event) => {
     setNewUserName(event.target.value)
   }
@@ -199,24 +281,22 @@ const TaskUser = (props) => {
     setNewPassword(event.target.value)
   }
   const handleClientChange = (event) => {
-    console.log(event.target.value)
     setClient(event.target.value)
   }
+  const handleEmailChange = (event) => {
+    setNewEmail(event.target.value)
+  }
   const handleRoleChange = (event) => {
-    console.log(event.target.value)
     setNewRole(event.target.value)
   }
 
   const fetchClients = async () => {
-    let role = localStorage.getItem('role')
-    console.log(role)
-    if (role > 2) {
+    if (!hasRole(getSessionRole(), [1, 2, 4])) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
     } else {
       let clients = await GetClients()
-      console.log(clients)
       setClients(clients)
     }
   }
@@ -226,18 +306,32 @@ const TaskUser = (props) => {
   }, [])
 
   const updateUser = async () => {
+    const problem = validateUserForm(newRole, client, newEmail)
+    if (problem) {
+      props.toast.current.showToast(problem)
+      return
+    }
     let user = props.User
+    user.email = newEmail
     user.userName = newUserName
     user.password = newPassword
     user.idRole = newRole
-    user.idClient = client
-    await UpdateUser(props.User)
+    user.idClient = roleNeedsClient(newRole) ? client : undefined
+    const result = await UpdateUser(props.User)
+    if (typeof result === 'string') {
+      props.toast.current.showToast(USER_ERROR_MESSAGES[result] ?? 'Could not update the user')
+      return
+    }
     props.GetUsers()
     setUpdateUserVisible(false)
     props.toast.current.showToast('User updated successfully')
   }
   const deleteUser = async () => {
-    await DeleteUser(props.User)
+    const result = await DeleteUser(props.User)
+    if (result === 'fail') {
+      props.toast.current.showToast('Could not delete the user')
+      return
+    }
     props.GetUsers()
     setDeleteUserVisible(false)
     props.toast.current.showToast('User deleted successfully')
@@ -266,6 +360,15 @@ const TaskUser = (props) => {
             <CCol xs={10}>
               <CFormInput type="password" placeholder="Password" onChange={handlePasswordChange} />
             </CCol>
+            <CCol xs={2}>Email</CCol>
+            <CCol xs={10}>
+              <CFormInput
+                type="email"
+                value={newEmail}
+                placeholder="Email"
+                onChange={handleEmailChange}
+              />
+            </CCol>
             <CCol xs={2}>Role</CCol>
             <CCol xs={10}>
               <CFormSelect
@@ -286,8 +389,9 @@ const TaskUser = (props) => {
                 aria-label="Default select example"
                 value={client}
                 onChange={handleClientChange}
+                disabled={!roleNeedsClient(newRole)}
               >
-                <option value={'00000000-0000-0000-0000-000000000000'}>Select One</option>
+                <option value={EMPTY_GUID}>Select One</option>
                 {clients.map((client) => (
                   <option key={client.guid} value={client.guid}>
                     {client.name}
@@ -331,20 +435,23 @@ const TaskUser = (props) => {
   )
 }
 
+/**
+ * Pantalla con la tabla de usuarios y sus acciones.
+ * @returns {JSX.Element} La vista de usuarios.
+ */
 const Users = () => {
   let navigate = useNavigate()
   const [Users, setUsers] = useState([])
   const toastRef = useRef()
+  const canEdit = hasRole(getSessionRole(), [ROLES.SUPER_ADMINISTRATOR, ROLES.SUPERVISOR])
 
   const fetchUsers = async () => {
-    let role = localStorage.getItem('role')
-    if (role > 2) {
+    if (!hasRole(getSessionRole(), [1, 2, 4])) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
     }
     let Users = await GetUsers()
-    console.log(Users)
     setUsers(Users)
   }
 
@@ -356,12 +463,14 @@ const Users = () => {
     <>
       <Toast ref={toastRef}></Toast>
       <h1>Users</h1>
-      <AddUserModal GetUsers={fetchUsers} toast={toastRef} />
+      {canEdit && <AddUserModal GetUsers={fetchUsers} toast={toastRef} />}
       <CRow>
         <CTable>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell scope="col">User name</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Email</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Role</CTableHeaderCell>
               <CTableHeaderCell scope="col"></CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -369,8 +478,10 @@ const Users = () => {
             {Users.map((User) => (
               <CTableRow key={User.guid}>
                 <CTableHeaderCell>{User.username}</CTableHeaderCell>
+                <CTableHeaderCell>{User.email ?? '—'}</CTableHeaderCell>
+                <CTableHeaderCell>{ROLE_NAMES[User.idRole]}</CTableHeaderCell>
                 <CTableHeaderCell>
-                  <TaskUser GetUsers={fetchUsers} toast={toastRef} User={User} />
+                  {canEdit && <TaskUser GetUsers={fetchUsers} toast={toastRef} User={User} />}
                 </CTableHeaderCell>
               </CTableRow>
             ))}

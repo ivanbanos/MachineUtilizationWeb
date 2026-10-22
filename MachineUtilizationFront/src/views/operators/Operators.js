@@ -25,7 +25,13 @@ import {
 } from '@coreui/react'
 
 import Toast from '../toast/Toast'
+import { getSessionRole, hasRole, isReadOnly } from '../../utils/roles'
 
+/**
+ * Botón y modal para dar de alta un operador del cliente en sesión.
+ * @param {object} props GetOperators para recargar y toast para avisar.
+ * @returns {JSX.Element} Botón de alta con su modal.
+ */
 const AddOperatorModal = (props) => {
   const [addOperatorVisible, setAddOperatorVisible] = useState(false)
   const [newOperatorName, setNewOperatorName] = useState()
@@ -70,6 +76,11 @@ const AddOperatorModal = (props) => {
   )
 }
 
+/**
+ * Botones y modales para editar y borrar un operador.
+ * @param {object} props Operator, GetOperators para recargar y toast para avisar.
+ * @returns {JSX.Element} Acciones de edición y borrado.
+ */
 const TaskOperator = (props) => {
   let navigate = useNavigate()
   const [updateOperatorVisible, setUpdateOperatorVisible] = useState(false)
@@ -142,14 +153,18 @@ const TaskOperator = (props) => {
   )
 }
 
+/**
+ * Lista de operadores; redirige a /Login si el rol no tiene acceso.
+ * @returns {JSX.Element} Tabla de operadores con controles de escritura según el rol.
+ */
 const Operators = () => {
   let navigate = useNavigate()
   const [operators, setOperators] = useState([])
   const toastRef = useRef()
+  const readOnly = isReadOnly(getSessionRole())
 
   const fetchOperators = async () => {
-    let role = localStorage.getItem('role')
-    if (role > 2) {
+    if (!hasRole(getSessionRole(), [1, 2, 4])) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
@@ -167,7 +182,7 @@ const Operators = () => {
     <>
       <Toast ref={toastRef}></Toast>
       <h1>Operators</h1>
-      <AddOperatorModal GetOperators={fetchOperators} toast={toastRef} />
+      {!readOnly && <AddOperatorModal GetOperators={fetchOperators} toast={toastRef} />}
       <CRow>
         <CTable>
           <CTableHead>
@@ -181,11 +196,13 @@ const Operators = () => {
               <CTableRow key={operator.guid}>
                 <CTableHeaderCell>{operator.name}</CTableHeaderCell>
                 <CTableHeaderCell>
-                  <TaskOperator
-                    GetOperators={fetchOperators}
-                    toast={toastRef}
-                    Operator={operator}
-                  />
+                  {!readOnly && (
+                    <TaskOperator
+                      GetOperators={fetchOperators}
+                      toast={toastRef}
+                      Operator={operator}
+                    />
+                  )}
                 </CTableHeaderCell>
               </CTableRow>
             ))}
