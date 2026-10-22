@@ -16,8 +16,13 @@ import { cilAccountLogout, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/ico
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
+import SubscriptionStatus from './SubscriptionStatus'
 import { logo } from 'src/assets/brand/logo'
 
+/**
+ * Encabezado del layout: botón de la barra lateral, navegación, estado de la suscripción y cierre de sesión.
+ * @returns {JSX.Element} El encabezado con el breadcrumb.
+ */
 const AppHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
@@ -42,6 +47,9 @@ const AppHeader = () => {
           </CNavItem>
         </CHeaderNav>
         <CHeaderNav>
+          <CNavItem className="d-flex align-items-center me-3">
+            <SubscriptionStatus />
+          </CNavItem>
           <CNavItem>
             <CNavLink href="#/Login">
               <CIcon icon={cilAccountLogout} size="lg" />

@@ -15,15 +15,30 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+import { ROLES } from '../../../utils/roles'
 import GetToken from '../../../services/GetToken'
 import '../../../App.css'
 
+const MACHINE_MESSAGE = 'Machine users cannot sign in to the web portal'
+const SUSPENDED_MESSAGE = 'Your company subscription is suspended. Contact your administrator.'
+
+/**
+ * Pantalla de inicio de sesión; muestra el error de credenciales o de suscripción suspendida.
+ * @returns {JSX.Element} Formulario de login.
+ */
 const Login = () => {
   let navigate = useNavigate()
   localStorage.setItem('token', null)
   localStorage.setItem('role', null)
   localStorage.setItem('idClient', null)
-  const [errorMessages, seterrormessages] = useState({})
+  sessionStorage.removeItem('subscriptionNoticeStatus')
+  const [errorMessages, seterrormessages] = useState(() => {
+    if (sessionStorage.getItem('subscriptionSuspended')) {
+      sessionStorage.removeItem('subscriptionSuspended')
+      return { name: 'password', message: SUSPENDED_MESSAGE }
+    }
+    return {}
+  })
   const [first_name, setfirst_name] = useState()
   const [password, setPassword] = useState()
   const handleFirstNameChange = (event) => {
@@ -33,22 +48,23 @@ const Login = () => {
     setPassword(event.target.value)
   }
   const handleSubmit = async (event) => {
-    //Prevent page reload
     event.preventDefault()
     const token = await GetToken(first_name, password)
-    // Compare user info
-    if (token) {
+    if (token === 'suspended') {
+      seterrormessages({ name: 'password', message: SUSPENDED_MESSAGE })
+    } else if (token && Number(token.idRole) === ROLES.MACHINE) {
+      seterrormessages({ name: 'password', message: MACHINE_MESSAGE })
+    } else if (token) {
       localStorage.setItem('token', token.token)
       localStorage.setItem('role', token.idRole)
       localStorage.setItem('idClient', token.idClient)
       localStorage.setItem('userId', token.userId)
-      if (token.idRole < 3) {
-        navigate('/Dashboard', { replace: true })
-      } else {
+      if (Number(token.idRole) === ROLES.OPERATOR) {
         navigate('/Operator', { replace: true })
+      } else {
+        navigate('/Dashboard', { replace: true })
       }
     } else {
-      // Username not found
       seterrormessages({ name: 'password', message: 'Username or Password incorrect' })
     }
   }

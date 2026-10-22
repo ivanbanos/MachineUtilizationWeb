@@ -27,6 +27,7 @@ import {
 } from '@coreui/react'
 
 import Toast from '../toast/Toast'
+import { exportExcel } from '../../utils/excel'
 import configData from '../../config.json'
 import {
   Chart as ChartJS,
@@ -41,6 +42,14 @@ import { Bar } from 'react-chartjs-2'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
+/**
+ * Ventana con el detalle del turno de un día: producción, inactividad y piezas por media hora, y los últimos días.
+ * @param {Function} props.handleSetDayDetailVisible Recibe true o false para mostrar u ocultar la ventana.
+ * @param {boolean} props.dayDetailModalVisible Indica si la ventana está visible.
+ * @param {object[]} props.dayDetailSelect Periodos de media hora del día seleccionado; puede estar vacío.
+ * @param {object[]} props.rangeDayDetailSelect Totales diarios de los días anteriores.
+ * @returns {JSX.Element} La ventana con las gráficas y el botón de exportar.
+ */
 const DayDetailModal = ({
   handleSetDayDetailVisible,
   dayDetailModalVisible,
@@ -66,6 +75,26 @@ const DayDetailModal = ({
 
     return minutes >= start && minutes <= end
   })
+
+  /**
+   * Exporta a Excel los periodos de media hora que muestran las gráficas del día.
+   * @returns {void}
+   */
+  const handleExportExcel = () => {
+    const rows = dayDetailSelectAcotado.map((period) => [
+      moment(period.date).format('MM-DD-YYYY'),
+      moment(period.date).format('HH:mm'),
+      Number((period.productionTime * 60).toFixed(2)),
+      Number((period.idleTime * 60).toFixed(2)),
+      Math.floor(period.pieceCount ?? period.piece_count ?? 0),
+    ])
+    exportExcel(
+      `shift-detail-${moment(dayDetailSelect[0].date).format('YYYY-MM-DD')}.xlsx`,
+      'Shift detail',
+      ['Date', 'Time', 'Production time (mins)', 'Idle time (mins)', 'Piece count'],
+      rows,
+    )
+  }
 
   return (
     <>
@@ -168,6 +197,13 @@ const DayDetailModal = ({
           </CCol>
         </CModalBody>
         <CModalFooter>
+          <CButton
+            color="secondary"
+            disabled={dayDetailSelectAcotado.length === 0}
+            onClick={handleExportExcel}
+          >
+            Export Excel
+          </CButton>
           <CButton color="secondary" onClick={() => handleSetDayDetailVisible(false)}>
             Close
           </CButton>
@@ -176,62 +212,5 @@ const DayDetailModal = ({
     </>
   )
 }
-
-// const Cameras = (props) => {
-//   let navigate = useNavigate()
-//   const [cameras, setCameras] = useState([])
-//   const toastRef = useRef()
-
-//   const fetchCameras = async () => {
-//     let role = localStorage.getItem('role')
-//     if (role > 2) {
-//       navigate('/Login', { replace: true })
-//       localStorage.setItem('token', undefined)
-//       localStorage.setItem('role', undefined)
-//     }
-//     let cameras = await GetCameras(props.machineId)
-
-//     setCameras(cameras)
-//   }
-
-//   useEffect(() => {
-//     fetchCameras()
-//   }, [])
-
-//   return (
-//     <>
-//       <Toast ref={toastRef}></Toast>
-//       <h2>Cameras</h2>
-//       <AddCameraModal machineId={props.machineId} GetCameras={fetchCameras} toast={toastRef} />
-//       <CRow>
-//         <CTable>
-//           <CTableHead>
-//             <CTableRow>
-//               <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-//               <CTableHeaderCell scope="col"></CTableHeaderCell>
-//             </CTableRow>
-//           </CTableHead>
-//           <CTableBody>
-//             {Array.isArray(cameras) &&
-//               cameras.map((camera) => (
-//                 <CTableRow key={camera.guid}>
-//                   <CTableHeaderCell>{camera.name}</CTableHeaderCell>
-//                   <CTableHeaderCell>
-//                     <TaskCamera
-//                       GetCameras={fetchCameras}
-//                       toast={toastRef}
-//                       camera={camera}
-//                       machineId={props.machineId}
-//                     ></TaskCamera>
-//                   </CTableHeaderCell>
-//                 </CTableRow>
-//               ))}
-//             <CTableRow></CTableRow>
-//           </CTableBody>
-//         </CTable>
-//       </CRow>
-//     </>
-//   )
-// }
 
 export default DayDetailModal

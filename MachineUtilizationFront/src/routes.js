@@ -4,7 +4,6 @@ const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
-// Base
 const Accordion = React.lazy(() => import('./views/base/accordion/Accordion'))
 const Breadcrumbs = React.lazy(() => import('./views/base/breadcrumbs/Breadcrumbs'))
 const Cards = React.lazy(() => import('./views/base/cards/Cards'))
@@ -20,12 +19,10 @@ const Spinners = React.lazy(() => import('./views/base/spinners/Spinners'))
 const Tables = React.lazy(() => import('./views/base/tables/Tables'))
 const Tooltips = React.lazy(() => import('./views/base/tooltips/Tooltips'))
 
-// Buttons
 const Buttons = React.lazy(() => import('./views/buttons/buttons/Buttons'))
 const ButtonGroups = React.lazy(() => import('./views/buttons/button-groups/ButtonGroups'))
 const Dropdowns = React.lazy(() => import('./views/buttons/dropdowns/Dropdowns'))
 
-//Forms
 const ChecksRadios = React.lazy(() => import('./views/forms/checks-radios/ChecksRadios'))
 const FloatingLabels = React.lazy(() => import('./views/forms/floating-labels/FloatingLabels'))
 const FormControl = React.lazy(() => import('./views/forms/form-control/FormControl'))
@@ -37,12 +34,10 @@ const Validation = React.lazy(() => import('./views/forms/validation/Validation'
 
 const Charts = React.lazy(() => import('./views/charts/Charts'))
 
-// Icons
 const CoreUIIcons = React.lazy(() => import('./views/icons/coreui-icons/CoreUIIcons'))
 const Flags = React.lazy(() => import('./views/icons/flags/Flags'))
 const Brands = React.lazy(() => import('./views/icons/brands/Brands'))
 
-// Notifications
 const Alerts = React.lazy(() => import('./views/notifications/alerts/Alerts'))
 const Badges = React.lazy(() => import('./views/notifications/badges/Badges'))
 const Modals = React.lazy(() => import('./views/notifications/modals/Modals'))
@@ -52,6 +47,7 @@ const Machines = React.lazy(() => import('./views/machines/MachinesList'))
 const Users = React.lazy(() => import('./views/users/Users'))
 const Operator = React.lazy(() => import('./views/operator/Operator'))
 const Operators = React.lazy(() => import('./views/operators/Operators'))
+const Subscriptions = React.lazy(() => import('./views/subscriptions/Subscriptions'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -102,6 +98,7 @@ const routes = [
   { path: '/notifications/modals', name: 'Modals', element: Modals },
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/operators', name: 'Operators', element: Operators },
+  { path: '/subscriptions', name: 'Subscriptions', element: Subscriptions },
 ]
 
 export default routes

@@ -8,6 +8,7 @@ import GetListOperators from '../../services/GetListOperators'
 import Cameras from '../cameras/Cameras'
 import DayDetailModal from '../dayDetail/DayDetailModal'
 import * as moment from 'moment'
+import { exportExcel } from '../../utils/excel'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   CButton,
@@ -44,6 +45,11 @@ const options = {
   },
 }
 
+/**
+ * Tarjeta con el promedio diario de una métrica y su color de referencia.
+ * @param {object} props Promedio ya formateado y color de la métrica.
+ * @returns {JSX.Element} Tarjeta de promedio.
+ */
 const AverageReport = (props) => {
   return (
     <CCol>
@@ -64,6 +70,10 @@ const AverageReport = (props) => {
   )
 }
 
+/**
+ * Resume la utilización de una máquina en un rango y operador, con gráficas, promedios y exportación a Excel.
+ * @returns {JSX.Element} Filtros, botón de exportación, gráficas y cámaras.
+ */
 const Summary = () => {
   let navigate = useNavigate()
   let { machineId } = useParams()
@@ -80,6 +90,7 @@ const Summary = () => {
   const handleSetDayDetailVisible = (stateDayDetailVisible) => {
     setDayDetailModalVisible(stateDayDetailVisible)
   }
+  const [appliedRange, setAppliedRange] = useState({ start: new Date(), end: new Date() })
   const [dayDetailSelect, setDayDetailSelect] = useState([])
   const [rangeDayDetailSelect, setRangeDayDetailSelect] = useState([])
 
@@ -105,6 +116,7 @@ const Summary = () => {
       navigate('/Login', { replace: true })
     } else {
       setMachineUtilizations(response)
+      setAppliedRange({ start: strat, end })
       const count = response.length
       setProductionTimeAverage(
         count
@@ -134,6 +146,37 @@ const Summary = () => {
 
   const handleOperatorChange = (event) => {
     setOperator(event.target.value)
+  }
+
+  /**
+   * Exporta a Excel los registros del último filtro aplicado, con los valores de las gráficas y una fila final de promedios.
+   * El archivo se nombra con la máquina y el rango de fechas aplicado.
+   * @returns {void}
+   */
+  const handleExportExcel = () => {
+    const rows = machineUtilizations.map((item) => [
+      moment(item.date).format('MM-DD-YYYY'),
+      (item.idleTime + item.productionTime).toFixed(2),
+      Number(item.productionTime).toFixed(2),
+      Number(item.idleTime).toFixed(2),
+      Math.floor(item.pieceCount || 0),
+    ])
+    rows.push([
+      'Average',
+      powerOnAverage.toFixed(2),
+      productionTimeAverage.toFixed(2),
+      '',
+      pieceCountAverage.toFixed(2),
+    ])
+    const fileName = `summary-${machine?.name || machineId}-${moment(appliedRange.start).format(
+      'YYYYMMDD',
+    )}-${moment(appliedRange.end).format('YYYYMMDD')}.xlsx`
+    exportExcel(
+      fileName,
+      'Summary',
+      ['Day', 'Power On', 'Production time', 'Idle time', 'Piece count'],
+      rows,
+    )
   }
   return (
     <>
@@ -183,6 +226,18 @@ const Summary = () => {
               </CButton>
             </CCardBody>
           </CCard>
+        </CCol>
+      </CRow>
+      <CRow className="justify-content-end">
+        <CCol xs="auto">
+          <CButton
+            color="secondary"
+            style={{ margin: '2pt' }}
+            disabled={machineUtilizations.length === 0}
+            onClick={handleExportExcel}
+          >
+            Export Excel
+          </CButton>
         </CCol>
       </CRow>
       <CRow>

@@ -33,8 +33,15 @@ import {
 } from '@coreui/react'
 
 import Toast from '../toast/Toast'
+import { exportExcel } from '../../utils/excel'
+import { getSessionRole, isReadOnly } from '../../utils/roles'
 import GetMachineUtilizationInformation from 'src/services/GetMachineUtilizationInformation'
 
+/**
+ * Botón y modal para asignar un operador, con sus horas, a un turno.
+ * @param {object} props Turno destino y referencia al toast de avisos.
+ * @returns {JSX.Element} Botón de apertura y modal de asignación.
+ */
 const AddUOperatorToMachineUtilization = (props) => {
   let userId = localStorage.getItem('userId')
   const [addOperatorVisible, setAddUOperatorVisible] = useState(false)
@@ -113,6 +120,10 @@ const AddUOperatorToMachineUtilization = (props) => {
   )
 }
 
+/**
+ * Muestra el detalle de un turno: información de uso y operadores asignados, exportables a Excel.
+ * @returns {JSX.Element} Información del turno, botón de exportación y tabla de operadores.
+ */
 const MachineShiftDetail = () => {
   let navigate = useNavigate()
   let { machineUtilizationId } = useParams()
@@ -135,6 +146,23 @@ const MachineShiftDetail = () => {
     fetchShiftDetail()
   }, [])
 
+  /**
+   * Exporta a Excel los operadores del turno ya cargados, con las horas como las muestra la tabla.
+   * @returns {void}
+   */
+  const handleExportExcel = () => {
+    const rows = machineUtilizationOperators.map((operator) => [
+      operator.operatorName,
+      operator.hours.toFixed(2),
+    ])
+    exportExcel(
+      `shift-detail-${machineUtilizationId}.xlsx`,
+      'Shift detail',
+      ['Operator', 'Hours'],
+      rows,
+    )
+  }
+
   return (
     <>
       <CRow>
@@ -145,10 +173,12 @@ const MachineShiftDetail = () => {
           <h5>{moment(machineUtilization.date).format('MM-DD-YYYY')}</h5>
         </CCol>
         <CCol className="align-self-end">
-          <AddUOperatorToMachineUtilization
-            toast={toastRef}
-            guid={machineUtilizationId}
-          ></AddUOperatorToMachineUtilization>
+          {!isReadOnly(getSessionRole()) && (
+            <AddUOperatorToMachineUtilization
+              toast={toastRef}
+              guid={machineUtilizationId}
+            ></AddUOperatorToMachineUtilization>
+          )}
         </CCol>
       </CRow>
       <CRow>
@@ -190,6 +220,18 @@ const MachineShiftDetail = () => {
               </CCardText>
             </CCardBody>
           </CCard>
+        </CCol>
+      </CRow>
+      <CRow className="justify-content-end">
+        <CCol xs="auto">
+          <CButton
+            color="secondary"
+            style={{ margin: '2pt' }}
+            disabled={machineUtilizationOperators.length === 0}
+            onClick={handleExportExcel}
+          >
+            Export Excel
+          </CButton>
         </CCol>
       </CRow>
       <CRow>

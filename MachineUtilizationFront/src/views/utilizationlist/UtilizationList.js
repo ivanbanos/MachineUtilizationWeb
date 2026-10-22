@@ -31,7 +31,13 @@ import {
 } from '@coreui/react'
 
 import Toast from '../toast/Toast'
+import { exportExcel } from '../../utils/excel'
 
+/**
+ * Botón que navega al detalle del turno de una utilización.
+ * @param {object} props Identificador de la utilización a abrir.
+ * @returns {JSX.Element} Botón con ícono de lupa.
+ */
 const SeeShiftDetail = (props) => {
   let navigate = useNavigate()
   return (
@@ -46,6 +52,10 @@ const SeeShiftDetail = (props) => {
   )
 }
 
+/**
+ * Lista las utilizaciones diarias de una máquina en un rango de fechas y permite exportarlas a Excel.
+ * @returns {JSX.Element} Filtros, botón de exportación y tabla de utilizaciones.
+ */
 const UtilizationList = () => {
   let navigate = useNavigate()
   let { machineId } = useParams()
@@ -68,7 +78,6 @@ const UtilizationList = () => {
     if (response == 'fail') {
       navigate('/Login', { replace: true })
     } else {
-      console.log(machineUtilizations.map((machine) => machine.date))
       setMachineUtilizations(response)
     }
   }
@@ -76,6 +85,30 @@ const UtilizationList = () => {
   useEffect(() => {
     fetchMachineUtilizations()
   }, [])
+
+  /**
+   * Exporta a Excel las filas de utilización ya cargadas, con los mismos valores que la tabla.
+   * El archivo se nombra con la máquina y el rango de fechas de los filtros.
+   * @returns {void}
+   */
+  const handleExportExcel = () => {
+    const rows = machineUtilizations.map((machineUtilization) => [
+      moment(machineUtilization.date).format('MM-DD-YYYY'),
+      (machineUtilization.productionTime + machineUtilization.idleTime).toFixed(2),
+      (24 - machineUtilization.productionTime - machineUtilization.idleTime).toFixed(2),
+      machineUtilization.productionTime.toFixed(2),
+      machineUtilization.idleTime.toFixed(2),
+    ])
+    const fileName = `utilization-${machine?.name || machineId}-${moment(strat).format(
+      'YYYYMMDD',
+    )}-${moment(end).format('YYYYMMDD')}.xlsx`
+    exportExcel(
+      fileName,
+      'Utilization',
+      ['Day', 'Power On', 'Power Off', 'Production time', 'Idle time'],
+      rows,
+    )
+  }
 
   return (
     <>
@@ -113,6 +146,18 @@ const UtilizationList = () => {
               </CButton>
             </CCardBody>
           </CCard>
+        </CCol>
+      </CRow>
+      <CRow className="justify-content-end">
+        <CCol xs="auto">
+          <CButton
+            color="secondary"
+            style={{ margin: '2pt' }}
+            disabled={machineUtilizations.length === 0}
+            onClick={handleExportExcel}
+          >
+            Export Excel
+          </CButton>
         </CCol>
       </CRow>
       <CRow>

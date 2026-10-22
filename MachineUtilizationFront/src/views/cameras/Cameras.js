@@ -29,7 +29,13 @@ import {
 
 import Toast from '../toast/Toast'
 import configData from '../../config.json'
+import { getSessionRole, hasRole, isReadOnly } from '../../utils/roles'
 
+/**
+ * Botón y modal para ver la transmisión de una cámara.
+ * @param {object} props Contiene camera, cuyas credenciales arman la URL.
+ * @returns {JSX.Element} Botón de visualización con su modal.
+ */
 const WatchCameraModal = (props) => {
   const [watchCameraVisible, setWatchCameraVisible] = useState(false)
   const userName = props.camera.user
@@ -38,9 +44,6 @@ const WatchCameraModal = (props) => {
     '%PASSWORD%',
     password,
   )
-
-  // console.log(cameraUrl)
-  // Imprime la URL dinámica resultante
 
   return (
     <>
@@ -81,6 +84,11 @@ const WatchCameraModal = (props) => {
   )
 }
 
+/**
+ * Celda de acciones de una cámara: ver, y editar o borrar si el rol puede modificar.
+ * @param {object} props camera, GetCameras, toast y readOnly; con readOnly solo se muestra el botón de ver.
+ * @returns {JSX.Element} Celda de acciones con sus modales.
+ */
 const TaskCamera = (props) => {
   let navigate = useNavigate()
   const [updateCameraVisible, setUpdateCameraVisible] = useState(false)
@@ -105,57 +113,74 @@ const TaskCamera = (props) => {
   return (
     <>
       <CTableHeaderCell>
-        <CButton style={{ margin: '2pt' }} onClick={() => setUpdateCameraVisible(true)}>
-          <CIcon icon={cilPencil} size="sm" />
-        </CButton>
-        <CButton style={{ margin: '2pt' }} onClick={() => setDeleteCameraVisible(true)}>
-          <CIcon icon={cilX} size="sm" />
-        </CButton>
+        {!props.readOnly && (
+          <>
+            <CButton style={{ margin: '2pt' }} onClick={() => setUpdateCameraVisible(true)}>
+              <CIcon icon={cilPencil} size="sm" />
+            </CButton>
+            <CButton style={{ margin: '2pt' }} onClick={() => setDeleteCameraVisible(true)}>
+              <CIcon icon={cilX} size="sm" />
+            </CButton>
+          </>
+        )}
         <WatchCameraModal camera={props.camera} />
       </CTableHeaderCell>
-      <CModal visible={updateCameraVisible} onClose={() => setUpdateCameraVisible(false)}>
-        <CModalHeader>
-          <CModalTitle>Updating Camera</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <CRow>
-            <CCol xs={2}>Name</CCol>
-            <CCol xs={10}>
-              <CFormInput placeholder="Name" onChange={handleNameChange} value={newCameraName} />
-            </CCol>
-          </CRow>
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setUpdateCameraVisible(false)}>
-            Close
-          </CButton>
-          <CButton color="primary" onClick={updateCamera}>
-            Update
-          </CButton>
-        </CModalFooter>
-      </CModal>
-      <CModal visible={deleteCameraVisible} onClose={() => setDeleteCameraVisible(false)}>
-        <CModalHeader>
-          <CModalTitle>Delete Camera</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <CRow>
-            <label>Are you sure?</label>
-          </CRow>
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setDeleteCameraVisible(false)}>
-            Close
-          </CButton>
-          <CButton color="primary" onClick={deleteCamera}>
-            Delete
-          </CButton>
-        </CModalFooter>
-      </CModal>
+      {!props.readOnly && (
+        <>
+          <CModal visible={updateCameraVisible} onClose={() => setUpdateCameraVisible(false)}>
+            <CModalHeader>
+              <CModalTitle>Updating Camera</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              <CRow>
+                <CCol xs={2}>Name</CCol>
+                <CCol xs={10}>
+                  <CFormInput
+                    placeholder="Name"
+                    onChange={handleNameChange}
+                    value={newCameraName}
+                  />
+                </CCol>
+              </CRow>
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setUpdateCameraVisible(false)}>
+                Close
+              </CButton>
+              <CButton color="primary" onClick={updateCamera}>
+                Update
+              </CButton>
+            </CModalFooter>
+          </CModal>
+          <CModal visible={deleteCameraVisible} onClose={() => setDeleteCameraVisible(false)}>
+            <CModalHeader>
+              <CModalTitle>Delete Camera</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              <CRow>
+                <label>Are you sure?</label>
+              </CRow>
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setDeleteCameraVisible(false)}>
+                Close
+              </CButton>
+              <CButton color="primary" onClick={deleteCamera}>
+                Delete
+              </CButton>
+            </CModalFooter>
+          </CModal>
+        </>
+      )}
     </>
   )
 }
 
+/**
+ * Botón y modal para dar de alta una cámara en una máquina.
+ * @param {object} props machineId, GetCameras para recargar y toast para avisar.
+ * @returns {JSX.Element} Botón de alta con su modal.
+ */
 const AddCameraModal = (props) => {
   const [addCameraVisible, setAddCameraVisible] = useState(false)
   const [cameraName, setCameraName] = useState('')
@@ -222,14 +247,19 @@ const AddCameraModal = (props) => {
   )
 }
 
+/**
+ * Lista de cámaras de una máquina; redirige a /Login si el rol no tiene acceso.
+ * @param {object} props Contiene machineId, la máquina cuyas cámaras se listan.
+ * @returns {JSX.Element} Tabla de cámaras con controles de escritura según el rol.
+ */
 const Cameras = (props) => {
   let navigate = useNavigate()
   const [cameras, setCameras] = useState([])
   const toastRef = useRef()
+  const readOnly = isReadOnly(getSessionRole())
 
   const fetchCameras = async () => {
-    let role = localStorage.getItem('role')
-    if (role > 2) {
+    if (!hasRole(getSessionRole(), [1, 2, 4])) {
       navigate('/Login', { replace: true })
       localStorage.setItem('token', undefined)
       localStorage.setItem('role', undefined)
@@ -247,7 +277,9 @@ const Cameras = (props) => {
     <>
       <Toast ref={toastRef}></Toast>
       <h2>Cameras</h2>
-      <AddCameraModal machineId={props.machineId} GetCameras={fetchCameras} toast={toastRef} />
+      {!readOnly && (
+        <AddCameraModal machineId={props.machineId} GetCameras={fetchCameras} toast={toastRef} />
+      )}
       <CRow>
         <CTable>
           <CTableHead>
@@ -266,6 +298,7 @@ const Cameras = (props) => {
                     toast={toastRef}
                     camera={camera}
                     machineId={props.machineId}
+                    readOnly={readOnly}
                   />
                 </CTableRow>
               ))}

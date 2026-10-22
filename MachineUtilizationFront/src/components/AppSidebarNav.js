@@ -3,10 +3,16 @@ import { NavLink, useLocation } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 import { CBadge } from '@coreui/react'
+import { getSessionRole, hasRole } from '../utils/roles'
 
+/**
+ * Menú lateral que muestra solo los ítems permitidos para el rol de la sesión.
+ * @param {{items: object[]}} props Ítems de navegación con su lista de roles.
+ * @returns {JSX.Element} Ítems de navegación visibles.
+ */
 export const AppSidebarNav = ({ items }) => {
   const location = useLocation()
-  const role = localStorage.getItem('role')
+  const role = getSessionRole()
   const navLink = (name, icon, badge) => {
     return (
       <>
@@ -59,7 +65,15 @@ export const AppSidebarNav = ({ items }) => {
     <React.Fragment>
       {items &&
         items.map((item, index) =>
-          item.level >= role ? item.items ? navGroup(item, index) : navItem(item, index) : <></>,
+          hasRole(role, item.roles) ? (
+            item.items ? (
+              navGroup(item, index)
+            ) : (
+              navItem(item, index)
+            )
+          ) : (
+            <></>
+          ),
         )}
     </React.Fragment>
   )
